@@ -4,7 +4,7 @@ from enum import Enum
 
 
 class EventType(Enum):
-    """Event types for the trading framework"""
+    """交易框架的事件类型"""
 
     ORDER_FILLED = "order_filled"
     ORDER_CANCELLED = "order_cancelled"
@@ -23,7 +23,7 @@ class EventType(Enum):
 
 @dataclass
 class Event:
-    """Base event class"""
+    """基础事件类"""
 
     type: EventType
     timestamp: float
@@ -32,7 +32,7 @@ class Event:
 
 
 class EventBus:
-    """Simple event bus for framework communication"""
+    """用于框架通信的简单事件总线"""
 
     def __init__(self):
         self._listeners: Dict[EventType, List[Callable[[Event], None]]] = {}
@@ -40,7 +40,7 @@ class EventBus:
     def subscribe(
         self, event_type: EventType, callback: Callable[[Event], None]
     ) -> None:
-        """Subscribe to an event type"""
+        """订阅事件类型"""
         if event_type not in self._listeners:
             self._listeners[event_type] = []
         self._listeners[event_type].append(callback)
@@ -48,7 +48,7 @@ class EventBus:
     def unsubscribe(
         self, event_type: EventType, callback: Callable[[Event], None]
     ) -> None:
-        """Unsubscribe from an event type"""
+        """取消订阅事件类型"""
         if event_type in self._listeners:
             try:
                 self._listeners[event_type].remove(callback)
@@ -56,11 +56,11 @@ class EventBus:
                 pass
 
     def emit(self, event: Event) -> None:
-        """Emit an event to all subscribers"""
+        """向所有订阅者发出事件"""
         if event.type in self._listeners:
             for callback in self._listeners[event.type]:
                 try:
                     callback(event)
                 except Exception as e:
-                    # Log error but don't stop other listeners
+                    # 记录错误但不停止其他监听器
                     print(f"Error in event listener: {e}")

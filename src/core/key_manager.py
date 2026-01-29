@@ -1,11 +1,11 @@
 """
-Private Key Manager
+私钥管理器
 
-Unified, secure private key management with support for:
-- Different keys for testnet vs mainnet
-- Per-bot instance key configuration
-- File-based and environment-based keys
-- Fallback strategies
+统一、安全的私钥管理,支持:
+- 测试网与主网使用不同密钥
+- 每个机器人实例的密钥配置
+- 基于文件和环境变量的密钥
+- 回退策略
 """
 
 import os
@@ -16,14 +16,14 @@ import logging
 
 class KeyManager:
     """
-    Unified private key management
+    统一的私钥管理
 
-    Priority order for key resolution:
-    1. Bot-specific config override
-    2. Environment-specific keys (testnet/mainnet)
-    3. Legacy single key (for backward compatibility)
-    4. File-based keys (environment-specific)
-    5. Legacy single key file
+    密钥解析的优先顺序:
+    1. 机器人特定配置覆盖
+    2. 环境特定密钥(测试网/主网)
+    3. 旧版单一密钥(向后兼容)
+    4. 基于文件的密钥(环境特定)
+    5. 旧版单一密钥文件
     """
 
     def __init__(self):

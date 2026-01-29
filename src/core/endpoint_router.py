@@ -1,8 +1,8 @@
 """
-Hyperliquid Endpoint Router
+Hyperliquid端点路由器
 
-Smart routing system for Hyperliquid API endpoints with automatic fallback.
-Supports multiple providers (public, Chainstack) with method-specific routing.
+具有自动回退的Hyperliquid API端点智能路由系统。
+支持多个提供商(公共、Chainstack)的方法特定路由。
 """
 
 import os
@@ -17,16 +17,16 @@ import httpx
 
 
 class EndpointType(Enum):
-    """Types of Hyperliquid endpoints"""
+    """Hyperliquid端点类型"""
 
-    INFO = "info"  # Read-only data (market data, user info)
-    EXCHANGE = "exchange"  # Trading operations (place/cancel orders)
-    WEBSOCKET = "websocket"  # Real-time data streams
-    EVM = "evm"  # HyperEVM JSON-RPC calls
+    INFO = "info"  # 只读数据(市场数据、用户信息)
+    EXCHANGE = "exchange"  # 交易操作(下单/取消订单)
+    WEBSOCKET = "websocket"  # 实时数据流
+    EVM = "evm"  # HyperEVM JSON-RPC调用
 
 
 class Provider(Enum):
-    """Endpoint providers"""
+    """端点提供商"""
 
     PUBLIC = "public"
     CHAINSTACK = "chainstack"
@@ -34,7 +34,7 @@ class Provider(Enum):
 
 @dataclass
 class EndpointConfig:
-    """Configuration for a specific endpoint"""
+    """特定端点的配置"""
 
     url: str
     provider: Provider
@@ -47,13 +47,13 @@ class EndpointConfig:
 
 class HyperliquidEndpointRouter:
     """
-    Smart endpoint router for Hyperliquid API calls
+    Hyperliquid API调用的智能端点路由器
 
-    Features:
-    - Method-specific routing based on compatibility matrix
-    - Automatic fallback on failures
-    - Periodic health monitoring
-    - Environment-based configuration
+    功能:
+    - 基于兼容性矩阵的方法特定路由
+    - 失败时自动回退
+    - 周期性健康监控
+    - 基于环境的配置
     """
 
     # Static compatibility matrix - which methods work with which endpoint types

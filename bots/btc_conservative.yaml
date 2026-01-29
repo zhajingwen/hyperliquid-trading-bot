@@ -1,56 +1,56 @@
-# CONSERVATIVE STRATEGY DEFINITION:
-# - LOW RISK: Uses only 10% of account balance to minimize potential losses
-# - NARROW RANGE: ±5% price range reduces exposure to large price swings  
-# - FEWER LEVELS: 10 grid levels for simpler management
-# - SLOWER REBALANCING: Only rebalances if price moves >12% outside range
+# 保守策略定义:
+# - 低风险: 仅使用账户余额的10%以最小化潜在损失
+# - 窄价格区间: ±5%的价格范围减少对大幅波动的暴露
+# - 更少网格层级: 10个网格层级便于简单管理
+# - 更慢的再平衡: 仅在价格移动超出区间>12%时重新平衡
 
 name: "btc_conservative_clean"
-active: true  # Options: true/false - Enable/disable this trading strategy
+active: true  # 选项: true/false - 启用/禁用此交易策略
 
 exchange:
-  type: "hyperliquid"  # Exchange type (options: "hyperliquid", "hl")
-  testnet: true        # Options: true/false - Use testnet for development
+  type: "hyperliquid"  # 交易所类型(选项: "hyperliquid", "hl")
+  testnet: true        # 选项: true/false - 使用测试网进行开发
 
 account:
-  max_allocation_pct: 10.0  # Uses only 10% of total account (range: 1-100%)
+  max_allocation_pct: 10.0  # 仅使用总账户的10%(范围: 1-100%)
 
 grid:
-  symbol: "BTC"    # Trading pair symbol (e.g., "BTC", "ETH", "SOL")
-  levels: 10       # Number of buy/sell orders
-  
+  symbol: "BTC"    # 交易对符号(例如 "BTC", "ETH", "SOL")
+  levels: 10       # 买卖订单数量
+
   price_range:
-    # Mode options:
-    # - "auto": Calculate range automatically from current price
-    # - "manual": Set fixed upper/lower price bounds
+    # 模式选项:
+    # - "auto": 从当前价格自动计算区间
+    # - "manual": 设置固定的上下限价格
     mode: "auto"
     auto:
-      range_pct: 5.0  # ±5% from center price (conservative: 3-8%, aggressive: 10-20%)
-    # manual:  # Only used when mode is "manual"
+      range_pct: 5.0  # 距中心价格±5%(保守: 3-8%, 激进: 10-20%)
+    # manual:  # 仅在模式为"manual"时使用
     #   upper_price: 45000.0
     #   lower_price: 35000.0
 
 risk_management:
-  # Stop Loss: Automatically close positions when loss exceeds threshold
-  stop_loss_enabled: false        # Options: true/false - Enable automatic stop loss
-  stop_loss_pct: 8.0             # Percentage loss before closing position (range: 1-20%)
-  
-  # Take Profit: Automatically close positions when profit exceeds threshold  
-  take_profit_enabled: false      # Options: true/false - Enable automatic take profit
-  take_profit_pct: 25.0          # Percentage profit before closing position (range: 5-100%)
-  
-  # Account Protection: Portfolio-level risk controls
-  max_drawdown_pct: 15.0         # Stop all trading if account drawdown exceeds % (range: 5-50%)
-  max_position_size_pct: 40.0    # Maximum position size as % of account (range: 10-100%)
-  
+  # 止损: 当损失超过阈值时自动关闭持仓
+  stop_loss_enabled: false        # 选项: true/false - 启用自动止损
+  stop_loss_pct: 8.0             # 关闭持仓前的损失百分比(范围: 1-20%)
+
+  # 止盈: 当盈利超过阈值时自动关闭持仓
+  take_profit_enabled: false      # 选项: true/false - 启用自动止盈
+  take_profit_pct: 25.0          # 关闭持仓前的盈利百分比(范围: 5-100%)
+
+  # 账户保护: 投资组合级别的风险控制
+  max_drawdown_pct: 15.0         # 如果账户回撤超过百分比则停止所有交易(范围: 5-50%)
+  max_position_size_pct: 40.0    # 最大仓位占账户的百分比(范围: 10-100%)
+
   rebalance:
-    # Rebalance threshold: when to recreate the grid
-    # Lower values = more frequent rebalancing = higher fees but tighter control
-    price_move_threshold_pct: 12.0  # Rebalance if price moves >12% outside range
+    # 再平衡阈值: 何时重新创建网格
+    # 较低值 = 更频繁的再平衡 = 更高费用但更紧密控制
+    price_move_threshold_pct: 12.0  # 如果价格移动超出区间>12%则再平衡
 
 monitoring:
-  # Log level options (from most to least verbose):
-  # - "DEBUG": All messages, detailed execution info, good for troubleshooting
-  # - "INFO": Important events, order placements, strategy changes (recommended)
-  # - "WARNING": Only warnings and errors, minimal output
-  # - "ERROR": Only critical errors that stop execution
+  # 日志级别选项(从最详细到最简洁):
+  # - "DEBUG": 所有消息,详细执行信息,适合故障排除
+  # - "INFO": 重要事件,订单下达,策略变化(推荐)
+  # - "WARNING": 仅警告和错误,最小输出
+  # - "ERROR": 仅停止执行的关键错误
   log_level: "INFO"

@@ -1,8 +1,8 @@
 """
-Strategy Interface
+策略接口
 
-Simple interface for implementing trading strategies.
-Newbies can add new strategies by implementing this interface.
+用于实现交易策略的简单接口。
+新手可以通过实现此接口来添加新策略。
 """
 
 from abc import ABC, abstractmethod
@@ -12,7 +12,7 @@ from enum import Enum
 
 
 class SignalType(Enum):
-    """Trading signal types"""
+    """交易信号类型"""
 
     BUY = "buy"
     SELL = "sell"
@@ -22,12 +22,12 @@ class SignalType(Enum):
 
 @dataclass
 class TradingSignal:
-    """A trading signal from a strategy"""
+    """来自策略的交易信号"""
 
     signal_type: SignalType
     asset: str
     size: float
-    price: Optional[float] = None  # None = market order
+    price: Optional[float] = None  # None = 市价单
     reason: str = ""
     metadata: Dict[str, Any] = None
 
@@ -38,7 +38,7 @@ class TradingSignal:
 
 @dataclass
 class MarketData:
-    """Market data provided to strategies"""
+    """提供给策略的市场数据"""
 
     asset: str
     price: float
@@ -51,10 +51,10 @@ class MarketData:
 
 @dataclass
 class Position:
-    """Current position information"""
+    """当前持仓信息"""
 
     asset: str
-    size: float  # Positive = long, negative = short
+    size: float  # 正数 = 多头, 负数 = 空头
     entry_price: float
     current_value: float
     unrealized_pnl: float
@@ -63,11 +63,11 @@ class Position:
 
 class TradingStrategy(ABC):
     """
-    Base interface for all trading strategies.
+    所有交易策略的基础接口。
 
-    This is the ONLY class newbies need to understand to add new strategies.
+    这是新手添加新策略需要理解的唯一类。
 
-    Example implementation:
+    示例实现:
 
     class MyStrategy(TradingStrategy):
         def __init__(self, config):

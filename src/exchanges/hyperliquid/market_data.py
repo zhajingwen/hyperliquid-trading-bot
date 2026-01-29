@@ -1,8 +1,8 @@
 """
-Hyperliquid Market Data Provider
+Hyperliquid市场数据提供者
 
-WebSocket-based real-time market data implementation.
-Technical implementation separated from business logic.
+基于WebSocket的实时市场数据实现。
+技术实现与业务逻辑分离。
 """
 
 import asyncio
@@ -16,10 +16,10 @@ from core.endpoint_router import get_endpoint_router
 
 class HyperliquidMarketData:
     """
-    Hyperliquid WebSocket market data provider
+    Hyperliquid WebSocket市场数据提供者
 
-    Provides real-time price feeds and market data via WebSocket.
-    Handles reconnection and error recovery automatically.
+    通过WebSocket提供实时价格推送和市场数据。
+    自动处理重连和错误恢复。
     """
 
     def __init__(self, testnet: bool = True):
@@ -28,24 +28,24 @@ class HyperliquidMarketData:
         self.running = False
         self.subscribed_assets: set = set()
 
-        # Callbacks
+        # 回调函数
         self.price_callbacks: Dict[str, List[Callable[[MarketData], None]]] = {}
 
-        # Latest data cache
+        # 最新数据缓存
         self.latest_data: Dict[str, MarketData] = {}
 
-        # Connection parameters
+        # 连接参数
         self.reconnect_delay = 5.0
         self.max_reconnect_attempts = 10
 
-        # Task management
+        # 任务管理
         self.message_handler_task = None
 
-        # Endpoint router for smart routing
+        # 用于智能路由的端点路由器
         self.endpoint_router = get_endpoint_router(testnet)
 
     async def connect(self) -> bool:
-        """Connect to Hyperliquid WebSocket using public endpoint"""
+        """使用公共端点连接到Hyperliquid WebSocket"""
         try:
             import websockets
 
@@ -59,7 +59,7 @@ class HyperliquidMarketData:
             self.ws = await websockets.connect(ws_url)
             self.running = True
 
-            # Only start message handler if not already running
+            # 仅在尚未运行时启动消息处理器
             if self.message_handler_task is None or self.message_handler_task.done():
                 self.message_handler_task = asyncio.create_task(self._message_handler())
 
@@ -74,10 +74,10 @@ class HyperliquidMarketData:
             return False
 
     async def disconnect(self) -> None:
-        """Disconnect from WebSocket"""
+        """从WebSocket断开连接"""
         self.running = False
 
-        # Cancel message handler task
+        # 取消消息处理器任务
         if self.message_handler_task and not self.message_handler_task.done():
             self.message_handler_task.cancel()
             try:
@@ -93,7 +93,7 @@ class HyperliquidMarketData:
     async def subscribe_price_updates(
         self, asset: str, callback: Callable[[MarketData], None]
     ) -> None:
-        """Subscribe to price updates for an asset"""
+        """订阅资产的价格更新"""
 
         if asset not in self.price_callbacks:
             self.price_callbacks[asset] = []
@@ -101,7 +101,7 @@ class HyperliquidMarketData:
         self.price_callbacks[asset].append(callback)
         self.subscribed_assets.add(asset)
 
-        # Subscribe via WebSocket
+        # 通过WebSocket订阅
         if self.ws and self.running:
             subscribe_msg = {"method": "subscribe", "subscription": {"type": "allMids"}}
             await self.ws.send(json.dumps(subscribe_msg))

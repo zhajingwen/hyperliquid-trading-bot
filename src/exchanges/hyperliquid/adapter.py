@@ -1,8 +1,8 @@
 """
-Hyperliquid Exchange Adapter
+Hyperliquid交易所适配器
 
-Clean implementation of Hyperliquid integration using the exchange interface.
-Technical implementation separated from business logic.
+使用交易所接口实现Hyperliquid集成的简洁实现。
+技术实现与业务逻辑分离。
 """
 
 from typing import Dict, List, Optional, Any
@@ -22,10 +22,10 @@ from core.endpoint_router import get_endpoint_router
 
 class HyperliquidAdapter(ExchangeAdapter):
     """
-    Hyperliquid DEX adapter implementation
+    Hyperliquid DEX适配器实现
 
-    Handles all Hyperliquid-specific technical details while implementing
-    the clean exchange interface that strategies can use.
+    处理所有Hyperliquid特定的技术细节,同时实现
+    策略可使用的简洁交易所接口。
     """
 
     def __init__(self, private_key: str, testnet: bool = True):

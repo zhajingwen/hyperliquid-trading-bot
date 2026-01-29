@@ -1,8 +1,8 @@
 """
-Exchange Interface
+交易所接口
 
-Simple interface for integrating new exchanges/DEXes.
-Newbies can add new exchanges by implementing this interface.
+用于集成新交易所/DEX的简单接口。
+新手可以通过实现此接口来添加新交易所。
 """
 
 from abc import ABC, abstractmethod
@@ -12,21 +12,21 @@ from enum import Enum
 
 
 class OrderSide(Enum):
-    """Order side"""
+    """订单方向"""
 
     BUY = "buy"
     SELL = "sell"
 
 
 class OrderType(Enum):
-    """Order type"""
+    """订单类型"""
 
     MARKET = "market"
     LIMIT = "limit"
 
 
 class OrderStatus(Enum):
-    """Order status"""
+    """订单状态"""
 
     PENDING = "pending"
     SUBMITTED = "submitted"
@@ -38,7 +38,7 @@ class OrderStatus(Enum):
 
 @dataclass
 class Order:
-    """Order representation"""
+    """订单表示"""
 
     id: str
     asset: str
@@ -50,12 +50,12 @@ class Order:
     filled_size: float = 0.0
     average_fill_price: float = 0.0
     exchange_order_id: Optional[str] = None
-    created_at: float = 0.0  # Timestamp when order was created
+    created_at: float = 0.0  # 订单创建时的时间戳
 
 
 @dataclass
 class Balance:
-    """Account balance"""
+    """账户余额"""
 
     asset: str
     available: float
@@ -65,7 +65,7 @@ class Balance:
 
 @dataclass
 class MarketInfo:
-    """Market/trading pair information"""
+    """市场/交易对信息"""
 
     symbol: str
     base_asset: str
@@ -78,11 +78,11 @@ class MarketInfo:
 
 class ExchangeAdapter(ABC):
     """
-    Base interface for all exchange integrations.
+    所有交易所集成的基础接口。
 
-    This is the ONLY class newbies need to understand to add new exchanges.
+    这是新手添加新交易所需要理解的唯一类。
 
-    Example implementation:
+    示例实现:
 
     class MyDEXAdapter(ExchangeAdapter):
         def __init__(self, api_key, secret):
@@ -91,7 +91,7 @@ class ExchangeAdapter(ABC):
             self.secret = secret
 
         async def get_balance(self, asset):
-            # Call your DEX API
+            # 调用你的DEX API
             return Balance(asset, available=1000, locked=0, total=1000)
     """
 

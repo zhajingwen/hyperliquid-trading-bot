@@ -1,46 +1,46 @@
 class TradingFrameworkError(Exception):
-    """Base exception for the trading framework"""
+    """交易框架的基础异常"""
 
     pass
 
 
 class ConfigurationError(TradingFrameworkError):
-    """Raised when configuration is invalid"""
+    """配置无效时抛出"""
 
     pass
 
 
 class StrategyError(TradingFrameworkError):
-    """Raised when strategy encounters an error"""
+    """策略遇到错误时抛出"""
 
     pass
 
 
 class ExchangeError(TradingFrameworkError):
-    """Raised when exchange operations fail"""
+    """交易所操作失败时抛出"""
 
     pass
 
 
 class OrderError(TradingFrameworkError):
-    """Raised when order operations fail"""
+    """订单操作失败时抛出"""
 
     pass
 
 
 class PositionError(TradingFrameworkError):
-    """Raised when position operations fail"""
+    """持仓操作失败时抛出"""
 
     pass
 
 
 class GridError(TradingFrameworkError):
-    """Raised when grid trading operations fail"""
+    """网格交易操作失败时抛出"""
 
     pass
 
 
 class TradingError(TradingFrameworkError):
-    """Raised for general trading operations errors"""
+    """一般交易操作错误时抛出"""
 
     pass
