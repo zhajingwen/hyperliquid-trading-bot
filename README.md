@@ -1,158 +1,158 @@
-## Extensible grid trading bot for [Hyperliquid DEX](https://hyperliquid.xyz)
+## [Hyperliquid DEX](https://hyperliquid.xyz)的可扩展网格交易机器人
 
-> ⚠️ This software is for educational and research purposes. Trading cryptocurrencies involves substantial risk of loss. Never trade with funds you cannot afford to lose. Always thoroughly test strategies on testnet before live deployment.
+> ⚠️ 本软件仅供教育和研究目的使用。交易加密货币涉及重大损失风险。切勿使用无法承受损失的资金进行交易。在实盘部署之前，请务必在测试网上充分测试策略。
 
-This project is under active development. Feel free to submit questions, suggestions, and issues through GitHub.
+本项目正在积极开发中。欢迎通过GitHub提交问题、建议和议题。
 
-You're welcome to use the best docs on Hyperliquid API via [Chainstack Developer Portal MCP server](https://docs.chainstack.com/docs/developer-portal-mcp-server).
+欢迎通过[Chainstack开发者门户MCP服务器](https://docs.chainstack.com/docs/developer-portal-mcp-server)使用Hyperliquid API的最佳文档。
 
-## 🚀 Quick start
+## 🚀 快速开始
 
-### **Prerequisites**
-- [uv package manager](https://github.com/astral-sh/uv)
-- Hyperliquid testnet account with testnet funds (see [Chainstack Hyperliquid faucet](https://faucet.chainstack.com/hyperliquid-testnet-faucet))
+### **前置要求**
+- [uv包管理器](https://github.com/astral-sh/uv)
+- Hyperliquid测试网账户及测试网资金（参见[Chainstack Hyperliquid水龙头](https://faucet.chainstack.com/hyperliquid-testnet-faucet)）
 
-### **Installation**
+### **安装**
 
 ```bash
-# Clone the repository
+# 克隆仓库
 git clone https://github.com/chainstacklabs/hyperliquid-trading-bot
 cd hyperliquid-trading-bot
 
-# Install dependencies using uv
+# 使用uv安装依赖
 uv sync
 
-# Set up environment variables
+# 设置环境变量
 cp .env.example .env
-# Edit .env with your Hyperliquid testnet private key
+# 编辑.env文件，填入你的Hyperliquid测试网私钥
 ```
 
-### **Configuration**
+### **配置**
 
-Create your environment file:
+创建你的环境文件：
 ```bash
 # .env
 HYPERLIQUID_TESTNET_PRIVATE_KEY=0xYOUR_PRIVATE_KEY_HERE
 HYPERLIQUID_TESTNET=true
 ```
 
-The bot comes with a pre-configured conservative BTC grid strategy in `bots/btc_conservative.yaml`. Review and adjust parameters as needed.
+机器人附带了一个预配置的保守BTC网格策略，位于`bots/btc_conservative.yaml`。请根据需要查看和调整参数。
 
-### **Running the bot**
+### **运行机器人**
 
 ```bash
-# Auto-discover and run the first active configuration
+# 自动发现并运行第一个活动配置
 uv run src/run_bot.py
 
-# Validate configuration before running
+# 运行前验证配置
 uv run src/run_bot.py --validate
 
-# Run specific configuration
+# 运行特定配置
 uv run src/run_bot.py bots/btc_conservative.yaml
 ```
 
-## ⚙️ Configuration
+## ⚙️ 配置
 
-Bot configurations use YAML format with comprehensive parameter documentation:
+机器人配置使用YAML格式，包含全面的参数文档：
 
 ```yaml
-# Conservative BTC Grid Strategy
+# 保守BTC网格策略
 name: "btc_conservative_clean"
-active: true  # Enable/disable this strategy
+active: true  # 启用/禁用此策略
 
 account:
-  max_allocation_pct: 10.0  # Use only 10% of account balance
+  max_allocation_pct: 10.0  # 仅使用账户余额的10%
 
 grid:
   symbol: "BTC"
-  levels: 10               # Number of grid levels
+  levels: 10               # 网格层级数量
   price_range:
-    mode: "auto"           # Auto-calculate from current price
+    mode: "auto"           # 根据当前价格自动计算
     auto:
-      range_pct: 5.0      # ±5% price range (conservative)
+      range_pct: 5.0      # ±5%价格范围（保守）
 
 risk_management:
-  # Exit Strategies
-  stop_loss_enabled: false      # Auto-close positions on loss threshold
-  stop_loss_pct: 8.0           # Loss % before closing (1-20%)
-  take_profit_enabled: false   # Auto-close positions on profit threshold
-  take_profit_pct: 25.0        # Profit % before closing (5-100%)
-  
-  # Account Protection
-  max_drawdown_pct: 15.0       # Stop trading on account drawdown % (5-50%)
-  max_position_size_pct: 40.0  # Max position as % of account (10-100%)
-  
-  # Grid Rebalancing
+  # 退出策略
+  stop_loss_enabled: false      # 在损失阈值时自动平仓
+  stop_loss_pct: 8.0           # 平仓前的损失百分比（1-20%）
+  take_profit_enabled: false   # 在利润阈值时自动平仓
+  take_profit_pct: 25.0        # 平仓前的利润百分比（5-100%）
+
+  # 账户保护
+  max_drawdown_pct: 15.0       # 在账户回撤百分比时停止交易（5-50%）
+  max_position_size_pct: 40.0  # 仓位占账户的最大百分比（10-100%）
+
+  # 网格再平衡
   rebalance:
-    price_move_threshold_pct: 12.0  # Rebalance trigger
+    price_move_threshold_pct: 12.0  # 再平衡触发器
 
 monitoring:
   log_level: "INFO"       # DEBUG/INFO/WARNING/ERROR
 ```
 
-## 📚 Learning examples
+## 📚 学习示例
 
-Master the Hyperliquid API with standalone educational scripts:
+通过独立的教学脚本掌握Hyperliquid API：
 
 ```bash
-# Authentication and connection
+# 身份验证和连接
 uv run learning_examples/01_authentication/basic_connection.py
 
-# Market data and pricing
+# 市场数据和价格
 uv run learning_examples/02_market_data/get_all_prices.py
 uv run learning_examples/02_market_data/get_market_metadata.py
 
-# Account information
+# 账户信息
 uv run learning_examples/03_account_info/get_user_state.py
 uv run learning_examples/03_account_info/get_open_orders.py
 
-# Trading operations
+# 交易操作
 uv run learning_examples/04_trading/place_limit_order.py
 uv run learning_examples/04_trading/cancel_orders.py
 
-# Real-time data
+# 实时数据
 uv run learning_examples/05_websockets/realtime_prices.py
 ```
 
-## 🛡️ Exit strategies
+## 🛡️ 退出策略
 
-The bot includes automated risk management and position exit features:
+机器人包含自动风险管理和持仓退出功能：
 
-**Position-level exits:**
-- **Stop loss**: Automatically close positions when loss exceeds configured percentage (1-20%)
-- **Take profit**: Automatically close positions when profit exceeds configured percentage (5-100%)
+**持仓级别退出：**
+- **止损**：当损失超过配置的百分比时自动平仓（1-20%）
+- **止盈**：当利润超过配置的百分比时自动平仓（5-100%）
 
-**Account-level protection:**
-- **Max drawdown**: Stop all trading when account-level losses exceed threshold (5-50%)
-- **Position size limits**: Prevent individual positions from exceeding percentage of account (10-100%)
+**账户级别保护：**
+- **最大回撤**：当账户级别损失超过阈值时停止所有交易（5-50%）
+- **仓位大小限制**：防止单个仓位超过账户的百分比（10-100%）
 
-**Operational exits:**
-- **Grid rebalancing**: Cancel orders and recreate grid when price moves outside range
-- **Graceful shutdown**: Cancel pending orders on bot termination (positions preserved by default)
+**操作退出：**
+- **网格再平衡**：当价格移出范围时取消订单并重新创建网格
+- **优雅关闭**：机器人终止时取消待处理订单（默认保留持仓）
 
-All exit strategies are configurable per bot and disabled by default for safety.
+所有退出策略都可按机器人配置，默认为禁用以确保安全。
 
-## 🔧 Development
+## 🔧 开发
 
-### **Package management**
-This project uses [uv](https://github.com/astral-sh/uv) for fast, reliable dependency management:
+### **包管理**
+本项目使用[uv](https://github.com/astral-sh/uv)进行快速、可靠的依赖管理：
 
 ```bash
-uv sync              # Install/sync dependencies
-uv add <package>     # Add new dependencies
-uv run <command>     # Run commands in virtual environment
+uv sync              # 安装/同步依赖
+uv add <package>     # 添加新依赖
+uv run <command>     # 在虚拟环境中运行命令
 ```
 
-### **Testing**
-All components are tested against Hyperliquid testnet:
+### **测试**
+所有组件均在Hyperliquid测试网上进行测试：
 
 ```bash
-# Test learning examples
+# 测试学习示例
 uv run learning_examples/04_trading/place_limit_order.py
 
-# Validate bot configuration
+# 验证机器人配置
 uv run src/run_bot.py --validate
 
-# Run bot in testnet mode (default)
+# 在测试网模式下运行机器人（默认）
 uv run src/run_bot.py
 ```
