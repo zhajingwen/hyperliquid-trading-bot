@@ -1,13 +1,13 @@
 """
-Real-time WebSocket monitor for Hyperliquid.
+Hyperliquid实时WebSocket监控器。
 
-Supports:
-- allMids (mid prices for all assets)
-- trades  (trade prints for a specific coin)
+支持：
+- allMids (所有资产的中间价)
+- trades  (特定币种的交易打印)
 
-Designed so you can add more subscriptions by:
-1) adding a new subscription dict
-2) registering a handler for its channel
+设计目标是让你可以通过以下方式添加更多订阅：
+1) 添加新的订阅字典
+2) 为其通道注册处理器
 """
 
 import asyncio
@@ -27,10 +27,10 @@ load_dotenv()
 WS_URL = os.getenv("HYPERLIQUID_TESTNET_PUBLIC_WS_URL")
 BASE_URL = os.getenv("HYPERLIQUID_TESTNET_CHAINSTACK_BASE_URL")
 
-ASSETS_TO_TRACK = ["ETH"]  # for allMids prints
-TRADES_COIN = "ETH"        # for trades subscription
+ASSETS_TO_TRACK = ["ETH"]  # 用于allMids打印
+TRADES_COIN = "ETH"        # 用于trades订阅
 
-# ---- Types ----
+# ---- 类型 ----
 
 JsonDict = Dict[str, Any]
 Handler = Callable[[JsonDict], Awaitable[None]]
@@ -38,7 +38,7 @@ Handler = Callable[[JsonDict], Awaitable[None]]
 
 @dataclass(frozen=True)
 class Subscription:
-    """Represents one WS subscription object (the inner 'subscription': {...})."""
+    """表示一个WS订阅对象（内部的'subscription': {...}）。"""
     type: str
     coin: Optional[str] = None
     dex: Optional[str] = None
@@ -57,17 +57,17 @@ class HyperliquidWsClient:
         self.ws_url = ws_url
         self.base_url = base_url
 
-        # state
+        # 状态
         self.prices: Dict[str, float] = {}
         self.id_to_symbol: Dict[str, str] = {}
 
-        # dispatcher
+        # 调度器
         self.handlers: Dict[str, Handler] = {}
 
-        # stop flag
+        # 停止标志
         self._running = True
 
-    # ---- lifecycle ----
+    # ---- 生命周期 ----
 
     def stop(self) -> None:
         self._running = False
@@ -81,11 +81,11 @@ class HyperliquidWsClient:
 
     async def load_symbol_mapping(self) -> None:
         """
-        Loads assetId -> symbol mapping using Info.meta().
+        使用Info.meta()加载assetId -> symbol映射。
 
-        Note: the official allMids doc describes mids as Record<string, string>.
-        In practice you may see keys that look like "@<asset_id>" (what your code handles).
-        This mapping lets you translate those to symbols.
+        注意：官方allMids文档将mids描述为Record<string, string>。
+        实际上你可能会看到类似"@<asset_id>"的键（你的代码处理的内容）。
+        此映射让你将这些转换为符号。
         """
         info = Info(self.base_url, skip_ws=True)
         meta = info.meta()
@@ -97,7 +97,7 @@ class HyperliquidWsClient:
 
         print(f"Loaded {len(self.id_to_symbol)} asset mappings")
 
-    # ---- subscription helpers ----
+    # ---- 订阅辅助方法 ----
 
     async def send_subscribe(self, websocket, sub: Subscription) -> None:
         msg = {"method": "subscribe", "subscription": sub.to_ws()}
@@ -107,10 +107,10 @@ class HyperliquidWsClient:
         msg = {"method": "unsubscribe", "subscription": sub.to_ws()}
         await websocket.send(json.dumps(msg))
 
-    # ---- handler registration ----
+    # ---- 处理器注册 ----
 
     def on(self, channel: str, handler: Handler) -> None:
-        """Register a handler for a given incoming message channel."""
+        """为给定的传入消息通道注册处理器。"""
         self.handlers[channel] = handler
 
     async def dispatch(self, data: JsonDict) -> None:
@@ -121,11 +121,11 @@ class HyperliquidWsClient:
         if handler:
             await handler(data)
         else:
-            # uncomment if you want to see other channels
+            # 如果你想查看其他通道，取消注释
             # print(f"ℹ️ Unhandled channel: {channel}")
             pass
 
-    # ---- handlers ----
+    # ---- 处理器 ----
 
     async def handle_subscription_response(self, data: JsonDict) -> None:
         print(f"✅ Subscription confirmed: {data.get('data')}")
@@ -136,19 +136,19 @@ class HyperliquidWsClient:
             return
 
         for k, price_str in mids.items():
-            # Keys may be "@<asset_id>" (what your original code assumed),
-            # or they may already be coin symbols depending on backend/version.
+            # 键可能是"@<asset_id>"（你的原始代码假设的）,
+            # 或者根据后端/版本，它们可能已经是币种符号。
             symbol: Optional[str] = None
 
             if isinstance(k, str) and k.startswith("@"):
                 # asset_id = k.lstrip("@")
                 # symbol = self.id_to_symbol.get(asset_id)
                 # if symbol is None:
-                #     # This asset ID is not in the perps universe, ignore
-                #     continue  # do NOT treat it as ETH
+                #     # 此资产ID不在永续合约universe中，忽略
+                #     continue  # 不要将其视为ETH
                 continue
             elif isinstance(k, str):
-                # treat as symbol directly
+                # 直接视为符号
                 symbol = k
 
             if not symbol or symbol not in ASSETS_TO_TRACK:
@@ -190,10 +190,10 @@ class HyperliquidWsClient:
             ts = t.get("time")
             tid = t.get("tid")
 
-            # minimal, readable trade print
+            # 最小化、可读的交易打印
             print(f"🧾 TRADE {coin} {side} px={px} sz={sz} time={ts} tid={tid}")
 
-    # ---- main loop ----
+    # ---- 主循环 ----
 
     async def run(self, subs: List[Subscription]) -> None:
         print("🔗 Loading asset mappings...")
@@ -202,7 +202,7 @@ class HyperliquidWsClient:
         print(f"🔗 Connecting to {self.ws_url}")
         self.install_signal_handlers()
 
-        # register default handlers
+        # 注册默认处理器
         self.on("subscriptionResponse", self.handle_subscription_response)
         self.on("allMids", self.handle_all_mids)
         self.on("trades", self.handle_trades)
@@ -211,7 +211,7 @@ class HyperliquidWsClient:
             async with websockets.connect(self.ws_url) as websocket:
                 print("✅ WebSocket connected!")
 
-                # subscribe to everything requested
+                # 订阅所有请求的内容
                 for sub in subs:
                     await self.send_subscribe(websocket, sub)
 
@@ -253,7 +253,7 @@ async def main():
         return
 
     client = HyperliquidWsClient(ws_url=WS_URL, base_url=BASE_URL)
-    # Subscriptions:
+    # 订阅类型:
     # mids
     # allMids
     # trades
@@ -265,19 +265,19 @@ async def main():
     # fills
     # ohlc
     subs = [
-        Subscription(type="allMids"),                                
-        # Subscription(type="allMids", dex="xyz"),                 
+        Subscription(type="allMids"),
+        # Subscription(type="allMids", dex="xyz"),
         # Subscription(type="trades", coin=TRADES_COIN),
     ]
-    # Dexes:
+    # Dex列表:
     #     curl -s https://api.hyperliquid.xyz/info \
     #   -H 'Content-Type: application/json' \
     #   -d '{"type":"perpDexs"}'
 
-    # xyz (fullName: “XYZ”)
-    # flx (fullName: “Felix Exchange”)
-    # vntl (fullName: “Ventuals”)
-    # hyna (fullName: “HyENA”)
+    # xyz (fullName: "XYZ")
+    # flx (fullName: "Felix Exchange")
+    # vntl (fullName: "Ventuals")
+    # hyna (fullName: "HyENA")
     await client.run(subs)
 
 

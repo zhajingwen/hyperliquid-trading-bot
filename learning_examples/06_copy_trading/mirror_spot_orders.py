@@ -1,12 +1,12 @@
 """
-Mirror spot orders from a leader wallet with fixed sizing.
-Monitors leader's spot orders and places corresponding orders for follower.
-Handles order placement, cancellation, and fills with real-time WebSocket monitoring.
+以固定大小镜像领导钱包的现货订单。
+监控领导者的现货订单并为跟随者下相应的订单。
+通过实时WebSocket监控处理订单下单、取消和成交。
 
-Fixed infinite loop issue when using same wallet for leader/follower:
-- Added message queue to process WebSocket messages sequentially
-- Each message processed completely before next one starts
-- Prevents race condition where follower orders appear while still placing them
+修复了使用同一钱包作为领导者/跟随者时的无限循环问题：
+- 添加消息队列以顺序处理WebSocket消息
+- 每条消息在下一条开始前完全处理
+- 防止跟随者订单在仍在下单时出现的竞态条件
 """
 
 import asyncio

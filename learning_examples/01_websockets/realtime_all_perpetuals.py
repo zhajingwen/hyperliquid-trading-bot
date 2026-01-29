@@ -1,6 +1,6 @@
 """
-Real-time monitoring of all Hyperliquid perpetual contracts.
-Subscribes to all active perpetual assets and displays live price updates.
+监控所有Hyperliquid永续合约的实时价格。
+订阅所有活跃的永续合约资产并显示实时价格更新。
 """
 
 import asyncio
@@ -27,7 +27,7 @@ BASE_URL = os.getenv(
 
 
 class AllPerpetualsMonitor:
-    """Monitor all perpetual contracts in real-time"""
+    """实时监控所有永续合约"""
 
     def __init__(self, ws_url: str, base_url: str):
         self.ws_url = ws_url
@@ -38,7 +38,7 @@ class AllPerpetualsMonitor:
         self.update_count = 0
 
     async def load_all_perp_symbols(self) -> None:
-        """Load all perpetual contract symbols from Hyperliquid API"""
+        """从Hyperliquid API加载所有永续合约符号"""
         info = Info(self.base_url, skip_ws=True)
         meta = info.meta()
 
@@ -49,7 +49,7 @@ class AllPerpetualsMonitor:
         print(f"✅ Loaded {len(self.all_perp_symbols)} perpetual contracts")
 
     async def handle_price_update(self, data: dict) -> None:
-        """Process price updates for all perpetual contracts"""
+        """处理所有永续合约的价格更新"""
         mids = (data.get("data") or {}).get("mids") or {}
 
         for k, price_str in mids.items():
@@ -76,7 +76,7 @@ class AllPerpetualsMonitor:
                 continue
 
     async def display_statistics(self) -> None:
-        """Display periodic statistics every 30 seconds"""
+        """每30秒显示周期性统计信息"""
         while self._running:
             await asyncio.sleep(30)
 
@@ -94,7 +94,7 @@ class AllPerpetualsMonitor:
             print("=" * 60 + "\n")
 
     async def run(self) -> None:
-        """Main run loop for the monitor"""
+        """监控器的主运行循环"""
         print("Hyperliquid - All Perpetuals Monitor")
         print("=" * 60)
         print(f"🔗 Using WebSocket: {self.ws_url}")
@@ -148,13 +148,13 @@ class AllPerpetualsMonitor:
             print("👋 Disconnected")
 
     def _shutdown(self):
-        """Handle graceful shutdown"""
+        """处理优雅关闭"""
         print("\n🛑 Shutting down...")
         self._running = False
 
 
 async def main():
-    """Main entry point"""
+    """主入口点"""
     monitor = AllPerpetualsMonitor(ws_url=WS_URL, base_url=BASE_URL)
     await monitor.run()
 

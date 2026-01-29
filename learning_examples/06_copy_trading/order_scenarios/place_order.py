@@ -1,6 +1,6 @@
 """
-Test script for placing spot orders to see how they appear in WebSocket.
-Creates a single spot order that can be monitored by the mirroring script.
+用于下现货订单以查看其在WebSocket中如何显示的测试脚本。
+创建可由镜像脚本监控的单个现货订单。
 """
 
 import asyncio

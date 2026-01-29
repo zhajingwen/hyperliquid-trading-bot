@@ -1,5 +1,5 @@
 """
-Displays account state including balances, positions, and margin health.
+显示账户状态，包括余额、持仓和保证金健康度。
 """
 
 import asyncio
@@ -18,7 +18,7 @@ WALLET_ADDRESS = os.getenv("TESTNET_WALLET_ADDRESS")
 
 
 async def method_1_sdk() -> Optional[Account]:
-    """Method 1: Using Hyperliquid Python SDK"""
+    """方法1：使用Hyperliquid Python SDK"""
     print("Method 1: Hyperliquid SDK")
     print("-" * 30)
 
@@ -46,7 +46,7 @@ async def method_1_sdk() -> Optional[Account]:
 
 
 async def method_2_raw_api() -> Optional[Account]:
-    """Method 2: Raw HTTP API calls"""
+    """方法2：原始HTTP API调用"""
     print("\nMethod 2: Raw HTTP API")
     print("-" * 30)
 

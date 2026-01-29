@@ -1,6 +1,6 @@
 """
-Test script for bulk cancelling multiple spot orders to see how it appears in WebSocket.
-Cancels all open spot orders using bulk_cancel method.
+用于批量取消多个现货订单以查看其在WebSocket中如何显示的测试脚本。
+使用bulk_cancel方法取消所有未成交的现货订单。
 """
 
 import asyncio

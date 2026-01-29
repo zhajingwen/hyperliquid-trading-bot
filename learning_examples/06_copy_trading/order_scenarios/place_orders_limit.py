@@ -1,8 +1,8 @@
 """
-Test script for placing different types of limit orders on spot market.
-Tests scenarios 1-9: GTC, IOC, ALO limit orders and time-limited orders.
+用于在现货市场下不同类型限价单的测试脚本。
+测试场景1-9：GTC、IOC、ALO限价单和限时订单。
 
-Available scenarios (1-9):
+可用场景（1-9）：
 === LIMIT ORDERS ===
 1. GTC Limit Buy        2. IOC Limit Buy        3. ALO Limit Buy
 4. GTC Limit Sell       5. IOC Limit Sell       6. ALO Limit Sell

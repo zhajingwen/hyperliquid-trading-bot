@@ -1,6 +1,6 @@
 """
-Test script for cancelling a specific spot order to see how it appears in WebSocket.
-Finds and cancels a single open spot order.
+用于取消特定现货订单以查看其在WebSocket中如何显示的测试脚本。
+查找并取消单个未成交的现货订单。
 """
 
 import asyncio

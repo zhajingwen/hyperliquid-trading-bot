@@ -1,6 +1,6 @@
 """
-Places limit orders using the Hyperliquid SDK with proper price calculation.
-Demonstrates order placement with market offset and result verification.
+使用Hyperliquid SDK下限价单，并进行正确的价格计算。
+演示带市场偏移的订单下单和结果验证。
 """
 
 import asyncio
@@ -16,16 +16,16 @@ from hyperliquid.utils.signing import OrderType as HLOrderType
 
 load_dotenv()
 
-# You can only use this endpoint on the official Hyperliquid public API.
-# It is not available through Chainstack, as the open-source node implementation does not support it yet.
+# 你只能在官方Hyperliquid公共API上使用此端点。
+# Chainstack不可用，因为开源节点实现尚不支持它。
 BASE_URL = os.getenv("HYPERLIQUID_TESTNET_PUBLIC_BASE_URL")
 SYMBOL = "BTC"
-ORDER_SIZE = 0.001  # Small test size
-PRICE_OFFSET_PCT = -5  # 5% below market for buy order
+ORDER_SIZE = 0.001  # 小测试大小
+PRICE_OFFSET_PCT = -5  # 买单价格低于市场5%
 
 
 async def method_sdk(private_key: str) -> Optional[str]:
-    """Method: Using Hyperliquid Python SDK"""
+    """方法：使用Hyperliquid Python SDK"""
     print("Method: Hyperliquid SDK")
     print("-" * 30)
 

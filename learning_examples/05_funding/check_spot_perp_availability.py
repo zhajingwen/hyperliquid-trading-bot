@@ -1,9 +1,9 @@
 """
-DEPRECATED: Use check_spot_perp_pairs_availability.py instead.
-This script checks token metadata, not actual tradable markets, which can lead to false positives.
+已弃用：请改用check_spot_perp_pairs_availability.py。
+此脚本检查代币元数据，而非实际可交易市场，可能导致误报。
 
-Checks which assets are available for both spot and perpetual trading.
-Essential for funding arbitrage - need both markets to execute the strategy.
+检查哪些资产同时可用于现货和永续合约交易。
+资金费率套利必需 - 需要两个市场来执行策略。
 """
 
 import asyncio
@@ -22,7 +22,7 @@ TEST_ASSETS = ["BTC", "ETH", "SOL"]
 
 
 async def get_spot_assets() -> Optional[Set[str]]:
-    """Get all assets available for spot trading"""
+    """获取所有可用于现货交易的资产"""
     print("Spot Assets")
     print("-" * 30)
 
@@ -61,7 +61,7 @@ async def get_spot_assets() -> Optional[Set[str]]:
 
 
 async def get_perp_assets() -> Optional[Set[str]]:
-    """Get all assets available for perpetual trading"""
+    """获取所有可用于永续合约交易的资产"""
     print("\nPerpetual Assets")
     print("-" * 35)
 
@@ -90,7 +90,7 @@ async def get_perp_assets() -> Optional[Set[str]]:
 
 
 async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
-    """Find assets available in both spot and perpetual markets"""
+    """查找在现货和永续合约市场都可用的资产"""
     print("\nFunding Arbitrage Eligible Assets")
     print("=" * 40)
 
@@ -112,8 +112,8 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
     for i in range(0, len(sorted_eligible), 8):
         row = sorted_eligible[i:i+8]
         print(f"   {', '.join(f'{asset:>5}' for asset in row)}")
-    
-    # Get current funding rates for eligible assets
+
+    # 获取符合条件资产的当前资金费率
     try:
         info = Info(PUBLIC_BASE_URL, skip_ws=True)
         meta_and_contexts = info.meta_and_asset_ctxs()
@@ -123,8 +123,8 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
         if meta_and_contexts and len(meta_and_contexts) >= 2:
             meta = meta_and_contexts[0]
             asset_ctxs = meta_and_contexts[1]
-            
-            # Map asset names from universe to contexts by index
+
+            # 通过索引将universe中的资产名称映射到contexts
             for i, asset_ctx in enumerate(asset_ctxs):
                 asset_name = meta["universe"][i]["name"] if i < len(meta["universe"]) else f"UNKNOWN_{i}"
                 if asset_name in eligible_assets:
@@ -136,7 +136,7 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
                         "funding_rate": funding_rate,
                         "funding_rate_pct": funding_rate * 100,
                         "mark_price": mark_price,
-                        "eligible_for_arbitrage": funding_rate > 0.0001  # Positive funding threshold
+                        "eligible_for_arbitrage": funding_rate > 0.0001  # 正资金费率阈值
                     })
             
             eligible_with_funding.sort(key=lambda x: x["funding_rate"], reverse=True)
@@ -159,14 +159,14 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
 
 
 async def get_market_liquidity_info() -> None:
-    """Get basic liquidity information for top arbitrage candidates"""
+    """获取顶级套利候选资产的基本流动性信息"""
     print("\nMarket Liquidity Analysis")
     print("-" * 30)
 
     try:
         async with httpx.AsyncClient() as client:
             for asset in TEST_ASSETS:
-                # You can only use this endpoint on the official Hyperliquid public API
+                # 你只能在官方Hyperliquid公共API上使用此端点
                 response = await client.post(
                     f"{PUBLIC_BASE_URL}/info",
                     json={"type": "l2Book", "coin": asset},
@@ -176,18 +176,18 @@ async def get_market_liquidity_info() -> None:
                 if response.status_code == 200:
                     book_data = response.json()
                     levels = book_data.get("levels", [])
-                    
+
                     if len(levels) >= 2:
-                        bids = levels[0]  # Buy orders
-                        asks = levels[1]  # Sell orders
+                        bids = levels[0]  # 买单
+                        asks = levels[1]  # 卖单
                         
                         if bids and asks:
                             best_bid_price = float(bids[0]["px"]) if bids else 0
                             best_ask_price = float(asks[0]["px"]) if asks else 0
                             spread = best_ask_price - best_bid_price
                             spread_pct = (spread / best_bid_price) * 100 if best_bid_price > 0 else 0
-                            
-                            bid_size = sum(float(level["sz"]) for level in bids[:5])  # Top 5 levels
+
+                            bid_size = sum(float(level["sz"]) for level in bids[:5])  # 前5个层级
                             ask_size = sum(float(level["sz"]) for level in asks[:5])
                             
                             print(f"   {asset}: Spread {spread_pct:.3f}%, "

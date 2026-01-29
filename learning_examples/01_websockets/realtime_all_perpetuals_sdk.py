@@ -1,6 +1,6 @@
 """
-Real-time monitoring of all Hyperliquid perpetual contracts using official SDK.
-Demonstrates using the hyperliquid-python-sdk's built-in WebSocket functionality.
+使用官方SDK监控所有Hyperliquid永续合约的实时价格。
+演示使用hyperliquid-python-sdk的内置WebSocket功能。
 """
 
 import asyncio
@@ -20,7 +20,7 @@ BASE_URL = os.getenv(
 
 
 class SDKPerpetualsMonitor:
-    """Monitor all perpetual contracts using official SDK WebSocket"""
+    """使用官方SDK WebSocket监控所有永续合约"""
 
     def __init__(self, base_url: str):
         self.base_url = base_url
@@ -31,7 +31,7 @@ class SDKPerpetualsMonitor:
         self.info: Info = None
 
     def load_all_perp_symbols(self) -> None:
-        """Load all perpetual contract symbols"""
+        """加载所有永续合约符号"""
         temp_info = Info(self.base_url, skip_ws=True)
         meta = temp_info.meta()
 
@@ -42,7 +42,7 @@ class SDKPerpetualsMonitor:
         print(f"✅ Loaded {len(self.all_perp_symbols)} perpetual contracts")
 
     def handle_price_update(self, data: Any) -> None:
-        """Callback for price updates from SDK WebSocket"""
+        """从SDK WebSocket接收价格更新的回调"""
         if not isinstance(data, dict):
             return
 
@@ -74,7 +74,7 @@ class SDKPerpetualsMonitor:
                 continue
 
     async def display_statistics(self) -> None:
-        """Display periodic statistics every 30 seconds"""
+        """每30秒显示周期性统计信息"""
         while self._running:
             await asyncio.sleep(30)
 
@@ -92,7 +92,7 @@ class SDKPerpetualsMonitor:
             print("=" * 60 + "\n")
 
     async def run(self) -> None:
-        """Main run loop using SDK WebSocket"""
+        """使用SDK WebSocket的主运行循环"""
         print("Hyperliquid - All Perpetuals Monitor (SDK Version)")
         print("=" * 60)
         print(f"🔗 Using API: {self.base_url}")
@@ -135,7 +135,7 @@ class SDKPerpetualsMonitor:
 
 
 async def main():
-    """Main entry point"""
+    """主入口点"""
     monitor = SDKPerpetualsMonitor(base_url=BASE_URL)
     await monitor.run()
 

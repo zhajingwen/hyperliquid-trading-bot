@@ -1,5 +1,5 @@
 """
-Retrieves and displays open orders from your account.
+检索并显示你账户中的未成交订单。
 """
 
 import asyncio
@@ -11,14 +11,14 @@ from hyperliquid.info import Info
 
 load_dotenv()
 
-# You can only use this endpoint on the official Hyperliquid public API.
-# It is not available through Chainstack, as the open-source node implementation does not support it yet.
+# 你只能在官方Hyperliquid公共API上使用此端点。
+# Chainstack不可用，因为开源节点实现尚不支持它。
 BASE_URL = os.getenv("HYPERLIQUID_TESTNET_PUBLIC_BASE_URL")
 WALLET_ADDRESS = os.getenv("TESTNET_WALLET_ADDRESS")
 
 
 async def method_1_sdk():
-    """Method 1: Using Hyperliquid Python SDK"""
+    """方法1：使用Hyperliquid Python SDK"""
     print("Method 1: Hyperliquid SDK")
     print("-" * 30)
 
@@ -53,7 +53,7 @@ async def method_1_sdk():
 
 
 async def method_2_raw_api():
-    """Method 2: Raw HTTP API call"""
+    """方法2：原始HTTP API调用"""
     print("\nMethod 2: Raw HTTP API")
     print("-" * 30)
 

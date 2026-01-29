@@ -1,6 +1,6 @@
 """
-Test script for cancelling TWAP orders to see how they appear in WebSocket.
-TWAP order cancellation uses raw API calls since they're not in the SDK yet.
+用于取消TWAP订单以查看其在WebSocket中如何显示的测试脚本。
+TWAP订单取消使用原始API调用，因为SDK中尚未包含它们。
 """
 
 import asyncio

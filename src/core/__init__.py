@@ -1,1 +1,1 @@
-# Core framework components
+# 核心框架组件

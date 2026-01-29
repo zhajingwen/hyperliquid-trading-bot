@@ -1,6 +1,6 @@
 """
-Real-time price monitoring using WebSocket connections.
-Demonstrates subscribing to live market data and handling price updates.
+使用WebSocket连接监控实时价格。
+演示订阅实时市场数据和处理价格更新。
 """
 
 import asyncio
@@ -17,21 +17,21 @@ WS_URL = os.getenv("HYPERLIQUID_TESTNET_PUBLIC_WS_URL")
 BASE_URL = os.getenv("HYPERLIQUID_TESTNET_CHAINSTACK_BASE_URL")
 ASSETS_TO_TRACK = ["BTC", "ETH", "SOL", "DOGE", "AVAX"]
 
-# Global state for demo
+# 演示的全局状态
 prices = {}
 id_to_symbol = {}
 running = False
 
 
 def signal_handler(signum, frame):
-    """Handle Ctrl+C gracefully"""
+    """优雅地处理Ctrl+C"""
     global running
     print("\nShutting down...")
     running = False
 
 
 async def load_symbol_mapping():
-    """Load mapping from asset IDs to symbols"""
+    """加载资产ID到符号的映射"""
     global id_to_symbol
 
     info = Info(BASE_URL, skip_ws=True)
@@ -45,17 +45,17 @@ async def load_symbol_mapping():
 
 
 async def handle_price_message(data):
-    """Process price update messages"""
+    """处理价格更新消息"""
     global prices
 
     channel = data.get("channel")
     if channel == "allMids":
-        # Get the mids data from the nested structure
+        # 从嵌套结构中获取mids数据
         mids_data = data.get("data", {}).get("mids", {})
 
-        # Update prices and show changes for tracked assets
+        # 更新价格并显示跟踪资产的变化
         for asset_id_with_at, price_str in mids_data.items():
-            # Remove @ prefix from asset ID
+            # 移除资产ID的@前缀
             asset_id = asset_id_with_at.lstrip("@")
             symbol = id_to_symbol.get(asset_id)
 
@@ -64,20 +64,20 @@ async def handle_price_message(data):
                     new_price = float(price_str)
                     old_price = prices.get(symbol)
 
-                    # Store new price
+                    # 存储新价格
                     prices[symbol] = new_price
 
                     if old_price is not None:
                         change = new_price - old_price
                         change_pct = (change / old_price) * 100 if old_price != 0 else 0
 
-                        # Show all updates
+                        # 显示所有更新
                         direction = "📈" if change > 0 else "📉" if change < 0 else "➡️"
                         print(
                             f"{direction} {symbol}: ${new_price:,.2f} ({change_pct:+.2f}%)"
                         )
                     else:
-                        # First price update
+                        # 首次价格更新
                         print(f"🔄 {symbol}: ${new_price:,.2f}")
 
                 except (ValueError, TypeError):
@@ -88,7 +88,7 @@ async def handle_price_message(data):
 
 
 async def monitor_prices():
-    """Connect to WebSocket and monitor real-time prices"""
+    """连接到WebSocket并监控实时价格"""
     global running
 
     print("🔗 Loading asset mappings...")
@@ -113,7 +113,7 @@ async def monitor_prices():
 
             running = True
 
-            # Listen for messages
+            # 监听消息
             async for message in websocket:
                 if not running:
                     break

@@ -1,6 +1,6 @@
 """
-Retrieves trading metadata including size/price decimals, max leverage, and trading constraints.
-Calculates minimum order sizes and price tick sizes for major assets.
+检索交易元数据，包括大小/价格小数位、最大杠杆和交易约束。
+计算主要资产的最小订单大小和价格刻度大小。
 """
 
 import asyncio
@@ -16,7 +16,7 @@ ASSETS_TO_ANALYZE = ["BTC", "ETH", "SOL"]
 
 
 async def method_1_sdk():
-    """Method 1: Using Hyperliquid Python SDK"""
+    """方法1：使用Hyperliquid Python SDK"""
     print("Method 1: Hyperliquid SDK")
     print("-" * 30)
 
@@ -44,7 +44,7 @@ async def method_1_sdk():
 
 
 async def method_2_raw_api():
-    """Method 2: Raw HTTP API call"""
+    """方法2：原始HTTP API调用"""
     print("\nMethod 2: Raw HTTP API")
     print("-" * 30)
 
@@ -84,7 +84,7 @@ async def method_2_raw_api():
 
 
 async def calculate_trading_constraints():
-    """Calculate minimum sizes and price ticks"""
+    """计算最小大小和价格刻度"""
     print("\nTrading Constraints")
     print("-" * 25)
 

@@ -1,6 +1,6 @@
 """
-Test script for modifying a spot order to see how it appears in WebSocket.
-Finds an open spot order and modifies its price or size.
+用于修改现货订单以查看其在WebSocket中如何显示的测试脚本。
+查找未成交的现货订单并修改其价格或大小。
 """
 
 import asyncio

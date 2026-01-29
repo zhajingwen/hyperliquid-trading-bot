@@ -1,6 +1,6 @@
 """
-Test script for bulk modifying multiple spot orders to see how it appears in WebSocket.
-Modifies all open spot orders using bulk_modify_orders_new method.
+用于批量修改多个现货订单以查看其在WebSocket中如何显示的测试脚本。
+使用bulk_modify_orders_new方法修改所有未成交的现货订单。
 """
 
 import asyncio

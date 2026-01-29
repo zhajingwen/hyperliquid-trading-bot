@@ -1,6 +1,6 @@
 """
-Retrieves current funding rates for all perpetual contracts.
-Shows which assets have positive funding (perps pay spot holders).
+检索所有永续合约的当前资金费率。
+显示哪些资产有正资金费率（永续合约支付给现货持有者）。
 """
 
 import asyncio
@@ -13,11 +13,11 @@ from hyperliquid.info import Info
 load_dotenv()
 
 BASE_URL = os.getenv("HYPERLIQUID_PUBLIC_BASE_URL")
-MIN_FUNDING_RATE = 0.0001  # 0.01% minimum threshold
+MIN_FUNDING_RATE = 0.0001  # 0.01%最小阈值
 
 
 async def get_funding_rates_sdk() -> Optional[List[Dict]]:
-    """Method 1: Using Hyperliquid Python SDK"""
+    """方法1：使用Hyperliquid Python SDK"""
     print("Method 1: Hyperliquid SDK")
     print("-" * 30)
 
@@ -30,8 +30,8 @@ async def get_funding_rates_sdk() -> Optional[List[Dict]]:
         if meta_and_contexts and len(meta_and_contexts) >= 2:
             meta = meta_and_contexts[0]
             asset_ctxs = meta_and_contexts[1]
-            
-            # Map asset names from universe to contexts by index
+
+            # 通过索引将universe中的资产名称映射到contexts
             for i, asset_ctx in enumerate(asset_ctxs):
                 asset_name = meta["universe"][i]["name"] if i < len(meta["universe"]) else f"UNKNOWN_{i}"
                 funding_rate = float(asset_ctx.get("funding", "0"))
@@ -42,7 +42,7 @@ async def get_funding_rates_sdk() -> Optional[List[Dict]]:
                         "asset": asset_name,
                         "funding_rate": funding_rate,
                         "funding_rate_pct": funding_rate * 100,
-                        "annual_rate_pct": funding_rate * 100 * 365 * 24,  # 24 payments/day
+                        "annual_rate_pct": funding_rate * 100 * 365 * 24,  # 每天24次支付
                         "mark_price": mark_price
                     })
             
@@ -65,7 +65,7 @@ async def get_funding_rates_sdk() -> Optional[List[Dict]]:
 
 
 async def get_funding_rates_raw() -> Optional[List[Dict]]:
-    """Method 2: Raw HTTP API call"""
+    """方法2：原始HTTP API调用"""
     print("\nMethod 2: Raw HTTP API")
     print("-" * 30)
 
@@ -84,8 +84,8 @@ async def get_funding_rates_raw() -> Optional[List[Dict]]:
                 if len(data) >= 2:
                     meta = data[0]
                     asset_ctxs = data[1]
-                    
-                    # Map asset names from universe to contexts by index
+
+                    # 通过索引将universe中的资产名称映射到contexts
                     for i, asset_ctx in enumerate(asset_ctxs):
                         asset_name = meta["universe"][i]["name"] if i < len(meta["universe"]) else f"UNKNOWN_{i}"
                         funding_rate = float(asset_ctx.get("funding", "0"))
@@ -120,7 +120,7 @@ async def get_funding_rates_raw() -> Optional[List[Dict]]:
 
 
 async def get_predicted_fundings() -> Optional[Dict]:
-    """Get predicted funding rates across exchanges"""
+    """获取跨交易所的预测资金费率"""
     print("\nPredicted Funding Rates (Cross-Exchange)")
     print("-" * 45)
 
@@ -134,8 +134,8 @@ async def get_predicted_fundings() -> Optional[Dict]:
 
             if response.status_code == 200:
                 predicted_fundings = response.json()
-                
-                # Process the list-based response format
+
+                # 处理基于列表的响应格式
                 if isinstance(predicted_fundings, list):
                     hl_positive_fundings = []
                     
@@ -153,8 +153,8 @@ async def get_predicted_fundings() -> Optional[Dict]:
                                         funding_rate = float(exchange_details['fundingRate'])
                                         if funding_rate > MIN_FUNDING_RATE:
                                             hl_positive_fundings.append((asset_name, funding_rate))
-                    
-                    # Display Hyperliquid positive funding rates
+
+                    # 显示Hyperliquid正资金费率
                     if hl_positive_fundings:
                         hl_positive_fundings.sort(key=lambda x: x[1], reverse=True)
                         print("Hyperliquid Perp - Top positive funding rates:")
@@ -178,21 +178,21 @@ async def get_predicted_fundings() -> Optional[Dict]:
 
 def calculate_profit_potential(funding_rate: float, position_value: float, hours_held: int = 1) -> Dict:
     """
-    Calculate potential profit from spot-long + perp-short funding arbitrage
-    
-    Strategy: Buy spot asset, short equivalent amount on perp
-    - Collect positive funding payments (perp shorts receive funding when rate > 0)
-    - Market neutral (spot long hedges perp short price risk)
+    计算现货多头 + 永续合约空头资金费率套利的潜在利润
+
+    策略：买入现货资产，在永续合约上做空等量
+    - 收取正资金费率支付（费率>0时永续合约空头收取资金费）
+    - 市场中性（现货多头对冲永续合约空头的价格风险）
     """
     funding_payments = hours_held
     gross_profit = funding_rate * position_value * funding_payments
-    
-    # Estimate trading fees for spot-perp arbitrage:
-    # - Buy spot: ~0.040% taker fee
-    # - Short perp: ~0.015% taker fee  
-    # - Sell spot: ~0.040% taker fee (exit)
-    # - Close perp: ~0.015% taker fee (exit)
-    estimated_fees = position_value * 0.0011  # Total ~0.11%
+
+    # 估算现货-永续合约套利的交易费用：
+    # - 买入现货：~0.040% taker费用
+    # - 做空永续合约：~0.015% taker费用
+    # - 卖出现货：~0.040% taker费用（退出）
+    # - 平仓永续合约：~0.015% taker费用（退出）
+    estimated_fees = position_value * 0.0011  # 总计~0.11%
     net_profit = gross_profit - estimated_fees
     
     return {

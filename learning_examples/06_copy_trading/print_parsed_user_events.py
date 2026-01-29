@@ -1,6 +1,6 @@
 """
-Monitor all order activity from a leader wallet using WebSocket.
-Shows real-time order placements, cancellations, and fills.
+使用WebSocket监控领导钱包的所有订单活动。
+显示实时订单下单、取消和成交。
 """
 
 import asyncio

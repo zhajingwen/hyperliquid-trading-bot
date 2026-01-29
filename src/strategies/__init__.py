@@ -1,30 +1,30 @@
 """
-Trading Strategies
+交易策略
 
-Business logic for different trading strategies.
-Add new strategies by implementing the TradingStrategy interface.
+不同交易策略的业务逻辑。
+通过实现TradingStrategy接口添加新策略。
 
-Available strategies:
-- BasicGridStrategy: Grid trading with geometric spacing and rebalancing
+可用策略：
+- BasicGridStrategy：具有几何间距和再平衡的网格交易
 """
 
 from .grid import BasicGridStrategy
 
-# Strategy registry - makes it easy to add new strategies
+# 策略注册表 - 便于添加新策略
 STRATEGY_REGISTRY = {
     "basic_grid": BasicGridStrategy,
-    "grid": BasicGridStrategy,  # Alias
+    "grid": BasicGridStrategy,  # 别名
 }
 
 
 def create_strategy(strategy_type: str, config: dict):
     """
-    Factory function to create strategies.
+    创建策略的工厂函数。
 
-    Makes it easy for newbies to add new strategies:
-    1. Implement TradingStrategy interface
-    2. Add to STRATEGY_REGISTRY
-    3. Done!
+    便于新手添加新策略：
+    1. 实现TradingStrategy接口
+    2. 添加到STRATEGY_REGISTRY
+    3. 完成！
     """
     if strategy_type not in STRATEGY_REGISTRY:
         available = ", ".join(STRATEGY_REGISTRY.keys())

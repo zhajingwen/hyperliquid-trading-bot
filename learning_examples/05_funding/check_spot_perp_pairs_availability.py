@@ -1,12 +1,12 @@
 """
-Checks which assets are available for BOTH spot markets/pairs and perpetual trading.
+检查哪些资产同时可用于现货市场/交易对和永续合约交易。
 
-1) Uses spot market pairs (from spot universe), not just token names.
-2) Prefers spotMetaAndAssetCtxs to get spot universe + spot contexts (for tradability + spot liquidity/price fields).
+1) 使用现货市场交易对（来自现货universe），而非仅代币名称。
+2) 优先使用spotMetaAndAssetCtxs获取现货universe + 现货contexts（用于可交易性 + 现货流动性/价格字段）。
 
-NOTE:
-- This still treats "eligible" as: (base asset has a spot market) AND (base asset has a perp market).
-- For real arb, you'd also check spot book depth/spread per pair (not added here).
+注意：
+- 这仍将"符合条件"视为：（基础资产有现货市场）且（基础资产有永续合约市场）。
+- 对于真实套利，你还需检查每个交易对的现货深度/价差（此处未添加）。
 """
 
 import asyncio
@@ -27,12 +27,12 @@ MIN_FUNDING_RATE = 0.0001
 
 async def get_spot_markets() -> Optional[Dict[str, Dict]]:
     """
-    Get all spot markets (pair ids) and spot contexts using spotMetaAndAssetCtxs.
+    使用spotMetaAndAssetCtxs获取所有现货市场（交易对ID）和现货contexts。
 
-    Returns mapping keyed by BASE token symbol:
+    返回按基础代币符号键入的映射：
       {
         "PURR": {
-            "market_ids": {"PURR/USDC"},        # canonical name or @index
+            "market_ids": {"PURR/USDC"},        # 规范名称或@index
             "by_market_id": {
                 "PURR/USDC": {"ctx": {...}, "quote": "USDC", "market_index": 0},
                 ...
@@ -50,7 +50,7 @@ async def get_spot_markets() -> Optional[Dict[str, Dict]]:
 
     try:
         async with httpx.AsyncClient() as client:
-            # You can only use this endpoint on the official Hyperliquid public API
+            # 你只能在官方Hyperliquid公共API上使用此端点
             resp = await client.post(
                 f"{PUBLIC_BASE_URL}/info",
                 json={"type": "spotMetaAndAssetCtxs"},
@@ -76,7 +76,7 @@ async def get_spot_markets() -> Optional[Dict[str, Dict]]:
                 print("Missing tokens/universe in spotMetaAndAssetCtxs")
                 return None
 
-            # Build token index -> token symbol
+            # 构建代币索引 -> 代币符号
             token_by_index = {}
             for t in tokens:
                 idx = t.get("index")
@@ -95,7 +95,7 @@ async def get_spot_markets() -> Optional[Dict[str, Dict]]:
                 base = token_by_index.get(base_idx)
                 quote = token_by_index.get(quote_idx)
 
-                # Spot market identifier: "PURR/USDC" for canonical, "@1" for most others
+                # 现货市场标识符：规范的为"PURR/USDC"，其他大多为"@1"
                 market_id = mkt.get("name") or f"@{mkt.get('index', i)}"
                 market_index = mkt.get("index", i)
 
@@ -113,7 +113,7 @@ async def get_spot_markets() -> Optional[Dict[str, Dict]]:
                     "isCanonical": bool(mkt.get("isCanonical", False)),
                 }
 
-            # Print a compact summary
+            # 打印简洁摘要
             total_markets = sum(len(v["market_ids"]) for v in spot_markets.values())
             print(f"Found {total_markets} spot markets across {len(spot_markets)} base tokens")
             preview = []
@@ -133,7 +133,7 @@ async def get_spot_markets() -> Optional[Dict[str, Dict]]:
 
 
 async def get_perp_assets() -> Optional[Set[str]]:
-    """Get all assets available for perpetual trading."""
+    """获取所有可用于永续合约交易的资产。"""
     print("\nPerpetual Assets")
     print("-" * 35)
 
@@ -163,10 +163,10 @@ async def get_perp_assets() -> Optional[Set[str]]:
 
 async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
     """
-    Find assets available in BOTH:
-      - at least one spot market pair (from spot universe)
-      - perpetual markets
-    Then attach perp funding + mark price for those eligible assets.
+    查找在以下两者都可用的资产：
+      - 至少一个现货市场交易对（来自现货universe）
+      - 永续合约市场
+    然后为这些符合条件的资产附加永续合约资金费率 + 标记价格。
     """
     print("\nFunding Arbitrage Eligible Assets (Spot pairs + Perps)")
     print("=" * 55)
@@ -191,7 +191,7 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
         pairs_preview = ", ".join(pairs[:6]) + (f" ...(+{len(pairs)-6})" if len(pairs) > 6 else "")
         print(f"   {base:>6}: {pairs_preview}")
 
-    # Attach current perp funding for eligible assets
+    # 为符合条件的资产附加当前永续合约资金费率
     try:
         info = Info(PUBLIC_BASE_URL, skip_ws=True)
         meta_and_contexts = info.meta_and_asset_ctxs()
@@ -212,7 +212,7 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
                     pairs = sorted(list(spot_markets[asset_name]["market_ids"]))
                     eligible_with_funding.append({
                         "asset": asset_name,
-                        "spot_pairs": pairs,  # ✅ pairs, not tokens
+                        "spot_pairs": pairs,  # ✅ 交易对，而非代币
                         "funding_rate": funding_rate,
                         "funding_rate_pct": funding_rate * 100,
                         "perp_mark_price": mark_price,
@@ -242,7 +242,7 @@ async def find_arbitrage_eligible_assets() -> Optional[List[Dict]]:
 
 
 async def get_market_liquidity_info() -> None:
-    """Get basic perp liquidity information for a few high-liquidity assets."""
+    """获取几个高流动性资产的基本永续合约流动性信息。"""
     print("\nPerp Market Liquidity Analysis")
     print("-" * 35)
 

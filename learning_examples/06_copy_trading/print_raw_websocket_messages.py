@@ -1,6 +1,6 @@
 """
-Simple raw message printer for ALL WebSocket messages.
-Shows unprocessed JSON messages from the API including positions, fills, and orders.
+所有WebSocket消息的简单原始消息打印器。
+显示来自API的未处理JSON消息，包括持仓、成交和订单。
 """
 
 import asyncio

@@ -1,6 +1,6 @@
 """
-Demonstrates order cancellation strategies: single orders and batch cancellation by asset.
-Shows proper order lifecycle management and cancellation verification.
+演示订单取消策略：单个订单和按资产批量取消。
+展示正确的订单生命周期管理和取消验证。
 """
 
 import asyncio
@@ -19,7 +19,7 @@ WALLET_ADDRESS = os.getenv("TESTNET_WALLET_ADDRESS")
 
 
 async def method_cancel_single_order(private_key: str) -> None:
-    """Method: Cancel single order using SDK"""
+    """方法：使用SDK取消单个订单"""
     print("Method: Cancel Single Order")
     print("-" * 30)
 
@@ -60,7 +60,7 @@ async def method_cancel_single_order(private_key: str) -> None:
             print(f"Cancel result:")
             print(json.dumps(result, indent=2))
 
-            # Check result structure
+            # 检查结果结构
             if result and isinstance(result, dict):
                 if result.get("status") == "ok":
                     response_data = result.get("response", {}).get("data", {})
@@ -69,7 +69,7 @@ async def method_cancel_single_order(private_key: str) -> None:
                     if statuses and statuses[0] == "success":
                         print(f"✅ Order {order_id} cancelled successfully!")
 
-                        # Verify cancellation
+                        # 验证取消
                         await asyncio.sleep(2)
                         new_orders = info.open_orders(account.address)
 

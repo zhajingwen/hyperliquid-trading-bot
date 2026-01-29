@@ -1,6 +1,6 @@
 """
-Fetches current market prices for all assets using SDK and raw HTTP API.
-Compares results to verify data consistency between methods.
+使用SDK和原始HTTP API获取所有资产的当前市场价格。
+比较结果以验证方法之间的数据一致性。
 """
 
 import asyncio
@@ -13,14 +13,14 @@ from hyperliquid.info import Info
 
 load_dotenv()
 
-# You can only use this endpoint on the official Hyperliquid public API.
-# It is not available through Chainstack, as the open-source node implementation does not support it yet.
+# 你只能在官方Hyperliquid公共API上使用此端点。
+# Chainstack不可用，因为开源节点实现尚不支持它。
 BASE_URL = os.getenv("HYPERLIQUID_TESTNET_PUBLIC_BASE_URL")
 ASSETS_TO_SHOW = ["BTC", "ETH", "SOL", "DOGE", "AVAX"]
 
 
 async def method_1_sdk() -> Optional[Dict[str, str]]:
-    """Method 1: Using Hyperliquid Python SDK"""
+    """方法1：使用Hyperliquid Python SDK"""
     print("Method 1: Hyperliquid SDK")
     print("-" * 30)
 
@@ -42,7 +42,7 @@ async def method_1_sdk() -> Optional[Dict[str, str]]:
 
 
 async def method_2_raw_api() -> Optional[Dict[str, str]]:
-    """Method 2: Raw HTTP API call"""
+    """方法2：原始HTTP API调用"""
     print("\nMethod 2: Raw HTTP API")
     print("-" * 30)
 

@@ -1,13 +1,13 @@
 """
-Mirror spot TWAP orders from a leader wallet with fixed sizing.
-Monitors leader's spot TWAP orders and places corresponding TWAP orders for follower.
-Handles TWAP placement, cancellation, and monitoring with real-time WebSocket monitoring.
+以固定大小镜像领导钱包的现货TWAP订单。
+监控领导者的现货TWAP订单并为跟随者下相应的TWAP订单。
+通过实时WebSocket监控处理TWAP下单、取消和监控。
 
-TWAP tracking (for tests with same wallet as leader and follower):
-- WebSocket events don't include TWAP IDs, only TWAP properties (coin, side, size, etc)
-- Uses combination keys (coin_side_minutes_randomize_size) to detect duplicates
-- Tracks leader vs follower combinations separately since follower adjusts size
-- Prevents processing our own follower TWAPs as new leader orders
+TWAP跟踪（用于使用同一钱包作为领导者和跟随者的测试）：
+- WebSocket事件不包括TWAP ID，仅TWAP属性（币种、方向、大小等）
+- 使用组合键（coin_side_minutes_randomize_size）检测重复
+- 单独跟踪领导者vs跟随者组合，因为跟随者调整大小
+- 防止将我们自己的跟随者TWAP作为新的领导者订单处理
 """
 
 import asyncio

@@ -1,41 +1,41 @@
 """
-Exchange Integrations
+交易所集成
 
-Technical implementations for different exchanges/DEXes.
-Add new exchanges by implementing the ExchangeAdapter interface.
+不同交易所/DEX的技术实现。
+通过实现ExchangeAdapter接口添加新交易所。
 
-To add a new exchange:
-1. Implement ExchangeAdapter interface
-2. Add to EXCHANGE_REGISTRY
-3. Update configuration to use exchange type
+添加新交易所的步骤：
+1. 实现ExchangeAdapter接口
+2. 添加到EXCHANGE_REGISTRY
+3. 更新配置以使用交易所类型
 """
 
 from .hyperliquid import HyperliquidAdapter, HyperliquidMarketData
 
-# Exchange registry - makes it easy to add new DEXes
+# 交易所注册表 - 便于添加新DEX
 EXCHANGE_REGISTRY = {
     "hyperliquid": HyperliquidAdapter,
 }
 
-# Aliases for convenience
+# 便捷别名
 EXCHANGE_REGISTRY["hl"] = HyperliquidAdapter
 
 
 def create_exchange_adapter(exchange_type: str, config: dict):
     """
-    Factory function to create exchange adapters.
+    创建交易所适配器的工厂函数。
 
-    Makes it easy to add new exchanges:
-    1. Implement ExchangeAdapter interface
-    2. Add to EXCHANGE_REGISTRY
-    3. Done!
+    便于添加新交易所：
+    1. 实现ExchangeAdapter接口
+    2. 添加到EXCHANGE_REGISTRY
+    3. 完成！
 
     Args:
-        exchange_type: Type of exchange (e.g., "hyperliquid", "binance")
-        config: Exchange configuration dictionary
+        exchange_type: 交易所类型（例如，"hyperliquid"，"binance"）
+        config: 交易所配置字典
 
     Returns:
-        ExchangeAdapter instance
+        ExchangeAdapter实例
     """
     if exchange_type not in EXCHANGE_REGISTRY:
         available = ", ".join(EXCHANGE_REGISTRY.keys())
@@ -45,9 +45,9 @@ def create_exchange_adapter(exchange_type: str, config: dict):
 
     exchange_class = EXCHANGE_REGISTRY[exchange_type]
 
-    # Extract common parameters for exchange initialization
+    # 提取交易所初始化的公共参数
     if exchange_type in ["hyperliquid", "hl"]:
-        # Hyperliquid-specific initialization
+        # Hyperliquid特定初始化
         private_key = config.get("private_key")
         testnet = config.get("testnet", True)
 
@@ -56,14 +56,14 @@ def create_exchange_adapter(exchange_type: str, config: dict):
 
         return exchange_class(private_key, testnet)
 
-    # Future exchanges will have their own initialization logic here
+    # 未来的交易所将在此处有自己的初始化逻辑
     # elif exchange_type == "binance":
     #     api_key = config.get("api_key")
     #     secret_key = config.get("secret_key")
     #     return exchange_class(api_key, secret_key)
 
     else:
-        # Default: try to pass config directly
+        # 默认：尝试直接传递配置
         return exchange_class(config)
 
 
