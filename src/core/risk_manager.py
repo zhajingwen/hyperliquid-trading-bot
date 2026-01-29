@@ -1,8 +1,8 @@
 """
-Risk Management Module
+风险管理模块
 
-Handles all risk-related decisions including stop loss, take profit, drawdown limits,
-and position size management. Designed for extensibility and clarity.
+处理所有风险相关决策,包括止损、止盈、回撤限制和仓位管理。
+设计注重可扩展性和清晰度。
 """
 
 from abc import ABC, abstractmethod
@@ -15,7 +15,7 @@ from interfaces.strategy import Position, MarketData
 
 
 class RiskAction(Enum):
-    """Actions that can be taken when risk rules are violated"""
+    """违反风险规则时可采取的操作"""
 
     NONE = "none"
     CLOSE_POSITION = "close_position"
@@ -27,7 +27,7 @@ class RiskAction(Enum):
 
 @dataclass
 class RiskEvent:
-    """Risk event notification"""
+    """风险事件通知"""
 
     rule_name: str
     asset: str
@@ -44,7 +44,7 @@ class RiskEvent:
 
 @dataclass
 class AccountMetrics:
-    """Account-level metrics for risk assessment"""
+    """用于风险评估的账户级别指标"""
 
     total_value: float
     total_pnl: float
@@ -57,10 +57,10 @@ class AccountMetrics:
 
 class RiskRule(ABC):
     """
-    Base interface for risk rules
+    风险规则的基础接口
 
-    Each rule implements one specific risk check (e.g., stop loss, drawdown)
-    and returns risk events when violations occur.
+    每个规则实现一个特定的风险检查(例如止损、回撤)
+    并在发生违规时返回风险事件。
     """
 
     def __init__(self, name: str, config: Dict[str, Any]):
@@ -76,25 +76,25 @@ class RiskRule(ABC):
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
         """
-        Evaluate risk rule and return events if violations occur
+        评估风险规则,如果发生违规则返回事件
 
-        Args:
-            positions: Current positions
-            market_data: Latest market data by asset
-            account_metrics: Account-level metrics
+        参数:
+            positions: 当前持仓
+            market_data: 按资产分类的最新市场数据
+            account_metrics: 账户级别指标
 
-        Returns:
-            List of risk events (empty if no violations)
+        返回:
+            风险事件列表(如果没有违规则为空)
         """
         pass
 
     def get_status(self) -> Dict[str, Any]:
-        """Get rule status"""
+        """获取规则状态"""
         return {"name": self.name, "enabled": self.enabled, "config": self.config}
 
 
 class StopLossRule(RiskRule):
-    """Stop loss risk rule - closes positions when loss exceeds threshold"""
+    """止损风险规则 - 当损失超过阈值时关闭持仓"""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__("stop_loss", config)
@@ -106,7 +106,7 @@ class StopLossRule(RiskRule):
         market_data: Dict[str, MarketData],
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
-        """Check stop loss conditions"""
+        """检查止损条件"""
 
         if not self.enabled:
             return []
@@ -114,7 +114,7 @@ class StopLossRule(RiskRule):
         events = []
 
         for position in positions:
-            # Calculate current loss percentage
+            # 计算当前损失百分比
             if position.entry_price > 0:
                 loss_pct = (
                     abs(
@@ -146,7 +146,7 @@ class StopLossRule(RiskRule):
 
 
 class TakeProfitRule(RiskRule):
-    """Take profit risk rule - closes positions when profit exceeds threshold"""
+    """止盈风险规则 - 当盈利超过阈值时关闭持仓"""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__("take_profit", config)
@@ -158,7 +158,7 @@ class TakeProfitRule(RiskRule):
         market_data: Dict[str, MarketData],
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
-        """Check take profit conditions"""
+        """检查止盈条件"""
 
         if not self.enabled:
             return []
@@ -166,7 +166,7 @@ class TakeProfitRule(RiskRule):
         events = []
 
         for position in positions:
-            # Calculate current profit percentage
+            # 计算当前盈利百分比
             if position.entry_price > 0 and position.unrealized_pnl > 0:
                 profit_pct = (
                     position.unrealized_pnl
@@ -195,7 +195,7 @@ class TakeProfitRule(RiskRule):
 
 
 class DrawdownRule(RiskRule):
-    """Drawdown risk rule - stops trading when account drawdown exceeds threshold"""
+    """回撤风险规则 - 当账户回撤超过阈值时停止交易"""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__("max_drawdown", config)
@@ -207,7 +207,7 @@ class DrawdownRule(RiskRule):
         market_data: Dict[str, MarketData],
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
-        """Check drawdown conditions"""
+        """检查回撤条件"""
 
         if not self.enabled:
             return []
@@ -235,7 +235,7 @@ class DrawdownRule(RiskRule):
 
 
 class PositionSizeRule(RiskRule):
-    """Position size risk rule - prevents individual positions from being too large"""
+    """仓位大小风险规则 - 防止单个持仓过大"""
 
     def __init__(self, config: Dict[str, Any]):
         super().__init__("max_position_size", config)
@@ -247,7 +247,7 @@ class PositionSizeRule(RiskRule):
         market_data: Dict[str, MarketData],
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
-        """Check position size conditions"""
+        """检查仓位大小条件"""
 
         if not self.enabled:
             return []
@@ -284,10 +284,10 @@ class PositionSizeRule(RiskRule):
 
 class RiskManager:
     """
-    Main risk management orchestrator
+    主风险管理编排器
 
-    Coordinates multiple risk rules and provides unified risk assessment.
-    Designed to be extensible - new risk rules can be easily added.
+    协调多个风险规则并提供统一的风险评估。
+    设计为可扩展 - 可以轻松添加新的风险规则。
     """
 
     def __init__(self, config: Dict[str, Any]):
@@ -295,15 +295,15 @@ class RiskManager:
         self.rules: List[RiskRule] = []
         self.risk_events_history: List[RiskEvent] = []
 
-        # Initialize risk rules based on configuration
+        # 根据配置初始化风险规则
         self._initialize_rules()
 
     def _initialize_rules(self):
-        """Initialize risk rules from configuration"""
+        """从配置初始化风险规则"""
 
         risk_config = self.config.get("risk_management", {})
 
-        # Stop loss rule
+        # 止损规则
         if risk_config.get("stop_loss_enabled", False):
             self.rules.append(
                 StopLossRule(
@@ -311,7 +311,7 @@ class RiskManager:
                 )
             )
 
-        # Take profit rule
+        # 止盈规则
         if risk_config.get("take_profit_enabled", False):
             self.rules.append(
                 TakeProfitRule(
@@ -322,7 +322,7 @@ class RiskManager:
                 )
             )
 
-        # Drawdown rule
+        # 回撤规则
         self.rules.append(
             DrawdownRule(
                 {
@@ -332,7 +332,7 @@ class RiskManager:
             )
         )
 
-        # Position size rule
+        # 仓位大小规则
         self.rules.append(
             PositionSizeRule(
                 {
@@ -351,15 +351,15 @@ class RiskManager:
         account_metrics: AccountMetrics,
     ) -> List[RiskEvent]:
         """
-        Evaluate all risk rules and return consolidated risk events
+        评估所有风险规则并返回合并的风险事件
 
-        Args:
-            positions: Current positions
-            market_data: Latest market data by asset
-            account_metrics: Account-level metrics
+        参数:
+            positions: 当前持仓
+            market_data: 按资产分类的最新市场数据
+            account_metrics: 账户级别指标
 
-        Returns:
-            List of risk events from all rules
+        返回:
+            来自所有规则的风险事件列表
         """
 
         all_events = []
@@ -369,11 +369,11 @@ class RiskManager:
                 events = rule.evaluate(positions, market_data, account_metrics)
                 all_events.extend(events)
 
-                # Store events in history
+                # 将事件存储到历史记录
                 self.risk_events_history.extend(events)
 
             except Exception as e:
-                # Log error but continue with other rules
+                # 记录错误但继续处理其他规则
                 error_event = RiskEvent(
                     rule_name=rule.name,
                     asset="SYSTEM",
@@ -387,15 +387,15 @@ class RiskManager:
         return all_events
 
     def add_rule(self, rule: RiskRule):
-        """Add a custom risk rule"""
+        """添加自定义风险规则"""
         self.rules.append(rule)
 
     def remove_rule(self, rule_name: str):
-        """Remove a risk rule by name"""
+        """按名称移除风险规则"""
         self.rules = [rule for rule in self.rules if rule.name != rule_name]
 
     def get_status(self) -> Dict[str, Any]:
-        """Get risk manager status"""
+        """获取风险管理器状态"""
 
         return {
             "enabled_rules": [rule.name for rule in self.rules if rule.enabled],
@@ -407,12 +407,12 @@ class RiskManager:
                     for e in self.risk_events_history
                     if time.time() - e.timestamp < 3600
                 ]
-            ),  # Last hour
+            ),  # 最近一小时
             "config": self.config.get("risk_management", {}),
         }
 
     def get_recent_events(self, hours: int = 1) -> List[RiskEvent]:
-        """Get recent risk events"""
+        """获取最近的风险事件"""
         cutoff_time = time.time() - (hours * 3600)
         return [
             event

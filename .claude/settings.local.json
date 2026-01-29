@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find:*)",
+      "Bash(python3 -c \"\nimport subprocess\nimport signal\nimport time\n\n# 启动进程\nproc = subprocess.Popen\\(\n    [''uv'', ''run'', ''python'', ''learning_examples/01_websockets/realtime_all_perpetuals.py''],\n    stdout=subprocess.PIPE,\n    stderr=subprocess.STDOUT,\n    text=True\n\\)\n\n# 读取8秒的输出\noutput_lines = []\nstart_time = time.time\\(\\)\nwhile time.time\\(\\) - start_time < 8:\n    line = proc.stdout.readline\\(\\)\n    if line:\n        output_lines.append\\(line.rstrip\\(\\)\\)\n        if len\\(output_lines\\) >= 30:  # 只保留前30行\n            break\n    time.sleep\\(0.1\\)\n\n# 终止进程\nproc.send_signal\\(signal.SIGINT\\)\ntime.sleep\\(1\\)\nproc.terminate\\(\\)\n\n# 打印输出\nfor line in output_lines[:30]:\n    print\\(line\\)\n\")",
+      "Bash(python3:*)",
+      "Bash(uv run python:*)",
+      "Bash(timeout 8 uv run:*)",
+      "Bash(uv run python3 -c \"\nimport subprocess\nimport signal\nimport time\n\n# 启动进程\nproc = subprocess.Popen\\(\n    [''uv'', ''run'', ''python'', ''learning_examples/01_websockets/realtime_all_perpetuals_sdk.py''],\n    stdout=subprocess.PIPE,\n    stderr=subprocess.STDOUT,\n    text=True\n\\)\n\n# 读取8秒的输出\noutput_lines = []\nstart_time = time.time\\(\\)\nwhile time.time\\(\\) - start_time < 8:\n    line = proc.stdout.readline\\(\\)\n    if line:\n        output_lines.append\\(line.rstrip\\(\\)\\)\n        if len\\(output_lines\\) >= 30:  # 只保留前30行\n            break\n    time.sleep\\(0.1\\)\n\n# 终止进程\nproc.send_signal\\(signal.SIGINT\\)\ntime.sleep\\(1\\)\nproc.terminate\\(\\)\n\n# 打印输出\nfor line in output_lines[:30]:\n    print\\(line\\)\n\")",
+      "Bash(uv run python3:*)",
+      "Bash(git remote set-url:*)"
+    ]
+  }
+}

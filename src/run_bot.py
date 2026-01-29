@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """
-Grid Trading Bot Runner
+网格交易机器人启动器
 
-Clean, simple entry point for running grid trading strategies.
-No confusing naming - just "run_bot.py".
+简洁明了的入口点,用于运行网格交易策略。
+没有混乱的命名 - 就是"run_bot.py"。
 """
 
 import asyncio
@@ -15,12 +15,12 @@ from pathlib import Path
 import yaml
 from typing import Optional
 
-# Load .env file if it exists
+# 如果存在则加载.env文件
 from dotenv import load_dotenv
 
 load_dotenv()
 
-# Add src to path for imports
+# 将src添加到路径以便导入
 sys.path.append(str(Path(__file__).parent))
 
 from core.engine import TradingEngine
@@ -29,10 +29,10 @@ from core.enhanced_config import EnhancedBotConfig
 
 class GridTradingBot:
     """
-    Simple grid trading bot runner
+    简单的网格交易机器人运行器
 
-    Clean interface - no "enhanced" or "advanced" confusion.
-    Just a bot that runs grid trading strategies.
+    简洁的接口 - 没有"增强"或"高级"的混淆。
+    只是一个运行网格交易策略的机器人。
     """
 
     def __init__(self, config_path: str):
@@ -41,37 +41,37 @@ class GridTradingBot:
         self.engine = None
         self.running = False
 
-        # Setup signal handlers
+        # 设置信号处理器
         signal.signal(signal.SIGINT, self._signal_handler)
         signal.signal(signal.SIGTERM, self._signal_handler)
 
     def _signal_handler(self, signum, frame):
-        """Handle shutdown signals"""
+        """处理关闭信号"""
         print(f"\n📡 Received signal {signum}, shutting down...")
         self.running = False
         if self.engine:
             asyncio.create_task(self.engine.stop())
 
     async def run(self) -> None:
-        """Run the bot"""
+        """运行机器人"""
 
         try:
-            # Load configuration
+            # 加载配置
             print(f"📁 Loading configuration: {self.config_path}")
             self.config = EnhancedBotConfig.from_yaml(Path(self.config_path))
             print(f"✅ Configuration loaded: {self.config.name}")
 
-            # Convert to engine config format
+            # 转换为引擎配置格式
             engine_config = self._convert_config()
 
-            # Initialize trading engine
+            # 初始化交易引擎
             self.engine = TradingEngine(engine_config)
 
             if not await self.engine.initialize():
                 print("❌ Failed to initialize trading engine")
                 return
 
-            # Start trading
+            # 开始交易
             print(f"🚀 Starting {self.config.name}")
             self.running = True
             await self.engine.start()
@@ -85,13 +85,13 @@ class GridTradingBot:
                 await self.engine.stop()
 
     def _convert_config(self) -> dict:
-        """Convert EnhancedBotConfig to engine config format"""
+        """将EnhancedBotConfig转换为引擎配置格式"""
 
         testnet = os.getenv("HYPERLIQUID_TESTNET", "true").lower() == "true"
 
-        # Calculate total allocation in USD from account balance percentage
-        # Note: This is a simplified approach - in production, you'd get actual account balance
-        # For now, using a default base amount of $1000 USD
+        # 从账户余额百分比计算USD总分配
+        # 注意:这是简化的方法 - 生产环境中应获取实际账户余额
+        # 目前使用默认基础金额$1000 USD
         base_allocation_usd = 1000.0
         total_allocation_usd = base_allocation_usd * (
             self.config.account.max_allocation_pct / 100.0
@@ -103,7 +103,7 @@ class GridTradingBot:
                 "testnet": self.config.exchange.testnet,
             },
             "strategy": {
-                "type": "basic_grid",  # Default to basic grid
+                "type": "basic_grid",  # 默认使用基础网格
                 "symbol": self.config.grid.symbol,
                 "levels": self.config.grid.levels,
                 "range_pct": self.config.grid.price_range.auto.range_pct,
@@ -111,7 +111,7 @@ class GridTradingBot:
                 "rebalance_threshold_pct": self.config.risk_management.rebalance.price_move_threshold_pct,
             },
             "bot_config": {
-                # Pass through the entire config so KeyManager can look for bot-specific keys
+                # 传递整个配置以便KeyManager可以查找机器人特定的密钥
                 "name": self.config.name,
                 "private_key_file": getattr(self.config, "private_key_file", None),
                 "testnet_key_file": getattr(self.config, "testnet_key_file", None),
@@ -129,16 +129,16 @@ class GridTradingBot:
 
 
 def find_first_active_config() -> Optional[Path]:
-    """Find the first active config in the bots folder"""
+    """在bots文件夹中查找第一个活动配置"""
 
-    # Look for bots folder relative to the script location
+    # 相对于脚本位置查找bots文件夹
     script_dir = Path(__file__).parent
     bots_dir = script_dir.parent / "bots"
 
     if not bots_dir.exists():
         return None
 
-    # Scan for YAML files
+    # 扫描YAML文件
     yaml_files = list(bots_dir.glob("*.yaml")) + list(bots_dir.glob("*.yml"))
 
     for yaml_file in sorted(yaml_files):
@@ -146,7 +146,7 @@ def find_first_active_config() -> Optional[Path]:
             with open(yaml_file, "r") as f:
                 data = yaml.safe_load(f)
 
-            # Check if config is active
+            # 检查配置是否激活
             if data and data.get("active", False):
                 print(f"📁 Found active config: {yaml_file.name}")
                 return yaml_file
@@ -159,20 +159,20 @@ def find_first_active_config() -> Optional[Path]:
 
 
 async def main():
-    """Main entry point"""
+    """主入口点"""
     parser = argparse.ArgumentParser(description="Grid Trading Bot")
     parser.add_argument(
         "config",
         nargs="?",
-        help="Configuration file path (optional - will auto-discover if not provided)",
+        help="配置文件路径(可选 - 如果未提供将自动发现)",
     )
     parser.add_argument(
-        "--validate", action="store_true", help="Validate configuration only"
+        "--validate", action="store_true", help="仅验证配置"
     )
 
     args = parser.parse_args()
 
-    # Determine config file
+    # 确定配置文件
     config_path = None
     if args.config:
         config_path = Path(args.config)
@@ -180,7 +180,7 @@ async def main():
             print(f"❌ Config file not found: {args.config}")
             return 1
     else:
-        # Auto-discover first active config
+        # 自动发现第一个活动配置
         print("🔍 No config specified, auto-discovering active config...")
         config_path = find_first_active_config()
         if not config_path:
@@ -189,7 +189,7 @@ async def main():
             return 1
 
     if args.validate:
-        # Just validate the config
+        # 仅验证配置
         try:
             config = EnhancedBotConfig.from_yaml(config_path)
             config.validate()
@@ -199,7 +199,7 @@ async def main():
             print(f"❌ Configuration error: {e}")
             return 1
 
-    # Run the bot
+    # 运行机器人
     bot = GridTradingBot(str(config_path))
     await bot.run()
     return 0

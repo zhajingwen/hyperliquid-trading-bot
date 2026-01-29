@@ -1,8 +1,8 @@
 """
-Trading Engine
+交易引擎
 
-Main orchestration component that connects strategies, exchanges, and infrastructure.
-Clean, focused responsibility - no confusing naming like "enhanced" or "advanced".
+连接策略、交易所和基础设施的主要编排组件。
+简洁、专注的职责 - 没有像"增强"或"高级"这样令人困惑的命名。
 """
 
 import asyncio
@@ -31,34 +31,34 @@ from core.risk_manager import RiskManager, RiskEvent, RiskAction, AccountMetrics
 
 class TradingEngine:
     """
-    Main trading engine that orchestrates everything
+    编排一切的主交易引擎
 
-    Responsibilities:
-    - Connect strategies to market data
-    - Execute trading signals via exchange adapters
-    - Manage order lifecycle
-    - Coordinate between all components
+    职责:
+    - 将策略连接到市场数据
+    - 通过交易所适配器执行交易信号
+    - 管理订单生命周期
+    - 协调所有组件之间的交互
 
-    This is the main "bot" - clean and focused.
+    这是主"机器人" - 简洁且专注。
     """
 
     def __init__(self, config: Dict[str, Any]):
         self.config = config
         self.running = False
 
-        # Core components
+        # 核心组件
         self.strategy: Optional[TradingStrategy] = None
         self.exchange: Optional[ExchangeAdapter] = None
         self.market_data: Optional[HyperliquidMarketData] = None
         self.risk_manager: Optional[RiskManager] = None
 
-        # State tracking
+        # 状态跟踪
         self.current_positions: List[Position] = []
         self.pending_orders: Dict[str, Order] = {}
         self.executed_trades = 0
         self.total_pnl = 0.0
 
-        # Setup logging
+        # 设置日志
         self.logger = logging.getLogger(__name__)
         logging.basicConfig(
             level=getattr(logging, config.get("log_level", "INFO")),
@@ -66,24 +66,24 @@ class TradingEngine:
         )
 
     async def initialize(self) -> bool:
-        """Initialize all components"""
+        """初始化所有组件"""
 
         try:
             self.logger.info("🚀 Initializing trading engine")
 
-            # Initialize exchange adapter
+            # 初始化交易所适配器
             if not await self._initialize_exchange():
                 return False
 
-            # Initialize market data
+            # 初始化市场数据
             if not await self._initialize_market_data():
                 return False
 
-            # Initialize strategy
+            # 初始化策略
             if not self._initialize_strategy():
                 return False
 
-            # Initialize risk manager
+            # 初始化风险管理器
             if not self._initialize_risk_manager():
                 return False
 
@@ -95,20 +95,20 @@ class TradingEngine:
             return False
 
     async def _initialize_exchange(self) -> bool:
-        """Initialize exchange adapter"""
+        """初始化交易所适配器"""
 
         exchange_config = self.config.get("exchange", {})
         testnet = exchange_config.get("testnet", True)
 
         try:
-            # Get private key using KeyManager
-            bot_config = self.config.get("bot_config")  # Optional bot-specific config
+            # 使用KeyManager获取私钥
+            bot_config = self.config.get("bot_config")  # 可选的机器人特定配置
             private_key = key_manager.get_private_key(testnet, bot_config)
         except ValueError as e:
             self.logger.error(f"❌ {e}")
             return False
 
-        # Use factory pattern to create exchange adapter
+        # 使用工厂模式创建交易所适配器
         from exchanges import create_exchange_adapter
 
         exchange_type = exchange_config.get("type", "hyperliquid")
@@ -123,7 +123,7 @@ class TradingEngine:
             return False
 
     async def _initialize_market_data(self) -> bool:
-        """Initialize market data provider"""
+        """初始化市场数据提供者"""
 
         testnet = self.config.get("exchange", {}).get("testnet", True)
         self.market_data = HyperliquidMarketData(testnet)
@@ -136,7 +136,7 @@ class TradingEngine:
             return False
 
     def _initialize_strategy(self) -> bool:
-        """Initialize trading strategy"""
+        """初始化交易策略"""
 
         strategy_config = self.config.get("strategy", {})
         strategy_type = strategy_config.get("type", "basic_grid")
@@ -155,7 +155,7 @@ class TradingEngine:
             return False
 
     def _initialize_risk_manager(self) -> bool:
-        """Initialize risk manager"""
+        """初始化风险管理器"""
 
         try:
             self.risk_manager = RiskManager(self.config)
@@ -167,7 +167,7 @@ class TradingEngine:
             return False
 
     async def start(self) -> None:
-        """Start the trading engine"""
+        """启动交易引擎"""
 
         if not self.strategy or not self.exchange or not self.market_data:
             raise RuntimeError("Engine not initialized")
@@ -175,27 +175,27 @@ class TradingEngine:
         self.running = True
         self.logger.info("🎬 Trading engine started")
 
-        # Subscribe to market data for strategy asset
+        # 订阅策略资产的市场数据
         asset = self.config.get("strategy", {}).get("symbol", "BTC")
         await self.market_data.subscribe_price_updates(asset, self._handle_price_update)
 
-        # Main trading loop
+        # 主交易循环
         await self._trading_loop()
 
     async def stop(self) -> None:
-        """Stop the trading engine gracefully"""
+        """优雅地停止交易引擎"""
 
         self.running = False
         self.logger.info("🛑 Stopping trading engine")
 
-        # Stop strategy
+        # 停止策略
         if self.strategy:
             self.strategy.stop()
 
-        # Handle positions and orders cleanup
+        # 处理持仓和订单清理
         if self.exchange:
             try:
-                # Get current positions before shutdown
+                # 关闭前获取当前持仓
                 current_positions = await self.exchange.get_positions()
 
                 if current_positions:
@@ -203,17 +203,17 @@ class TradingEngine:
                         f"📊 Found {len(current_positions)} open positions"
                     )
 
-                    # Option 1: Close all positions (more aggressive)
+                    # 选项1: 关闭所有持仓(更激进)
                     # for pos in current_positions:
                     #     await self.exchange.close_position(pos.asset)
                     #     self.logger.info(f"✅ Closed position: {pos.asset}")
 
-                    # Option 2: Just cancel orders and leave positions (more conservative)
+                    # 选项2: 仅取消订单保留持仓(更保守)
                     self.logger.info(
                         "⚠️ Leaving positions open - only cancelling orders"
                     )
 
-                # Cancel all pending orders
+                # 取消所有待处理订单
                 cancelled_orders = await self.exchange.cancel_all_orders()
                 if cancelled_orders > 0:
                     self.logger.info(f"✅ Cancelled {cancelled_orders} pending orders")
@@ -221,7 +221,7 @@ class TradingEngine:
             except Exception as e:
                 self.logger.error(f"❌ Error during cleanup: {e}")
 
-        # Disconnect components
+        # 断开组件连接
         if self.market_data:
             await self.market_data.disconnect()
         if self.exchange:
@@ -230,31 +230,31 @@ class TradingEngine:
         self.logger.info("✅ Trading engine stopped")
 
     async def _handle_price_update(self, market_data: MarketData) -> None:
-        """Handle incoming price updates"""
+        """处理接收到的价格更新"""
 
         if not self.running or not self.strategy:
             return
 
         try:
-            # Update current positions from exchange
+            # 从交易所更新当前持仓
             self.current_positions = await self.exchange.get_positions()
 
-            # Get current balance
+            # 获取当前余额
             balance_info = await self.exchange.get_balance(
                 "USD"
-            )  # Assuming USD balance
+            )  # 假设为USD余额
             balance = balance_info.available
 
-            # Risk management check
+            # 风险管理检查
             if self.risk_manager:
                 await self._handle_risk_events(market_data)
 
-            # Generate trading signals from strategy
+            # 从策略生成交易信号
             signals = self.strategy.generate_signals(
                 market_data, self.current_positions, balance
             )
 
-            # Execute signals
+            # 执行信号
             for signal in signals:
                 await self._execute_signal(signal)
 
@@ -262,10 +262,10 @@ class TradingEngine:
             self.logger.error(f"❌ Error handling price update: {e}")
 
     async def _handle_risk_events(self, market_data: MarketData) -> None:
-        """Handle risk management events"""
+        """处理风险管理事件"""
 
         try:
-            # Get account metrics
+            # 获取账户指标
             account_metrics_data = await self.exchange.get_account_metrics()
             account_metrics = AccountMetrics(
                 total_value=account_metrics_data.get("total_value", 0.0),
@@ -279,13 +279,13 @@ class TradingEngine:
                 ),
             )
 
-            # Evaluate risk events
+            # 评估风险事件
             market_data_dict = {market_data.asset: market_data}
             risk_events = self.risk_manager.evaluate_risks(
                 self.current_positions, market_data_dict, account_metrics
             )
 
-            # Handle risk events
+            # 处理风险事件
             for event in risk_events:
                 await self._execute_risk_action(event)
 
@@ -293,7 +293,7 @@ class TradingEngine:
             self.logger.error(f"❌ Error handling risk events: {e}")
 
     async def _execute_risk_action(self, event: RiskEvent) -> None:
-        """Execute action based on risk event"""
+        """根据风险事件执行操作"""
 
         try:
             self.logger.warning(f"🚨 Risk Event: {event.reason}")
@@ -306,7 +306,7 @@ class TradingEngine:
                     self.logger.error(f"❌ Failed to close position for {event.asset}")
 
             elif event.action == RiskAction.REDUCE_POSITION:
-                # For now, close 50% of position
+                # 目前关闭50%的持仓
                 reduction_pct = 0.5
                 current_positions = await self.exchange.get_positions()
                 for pos in current_positions:
@@ -332,13 +332,13 @@ class TradingEngine:
 
             elif event.action == RiskAction.EMERGENCY_EXIT:
                 self.logger.critical(f"🚨 EMERGENCY EXIT: {event.reason}")
-                # Get fresh positions from exchange and close all
+                # 从交易所获取最新持仓并全部关闭
                 current_positions = await self.exchange.get_positions()
                 for pos in current_positions:
                     await self.exchange.close_position(pos.asset)
-                # Cancel all orders
+                # 取消所有订单
                 await self.exchange.cancel_all_orders()
-                # Stop trading
+                # 停止交易
                 if self.strategy:
                     self.strategy.is_active = False
 
@@ -348,7 +348,7 @@ class TradingEngine:
             )
 
     async def _execute_signal(self, signal: TradingSignal) -> None:
-        """Execute a trading signal"""
+        """执行交易信号"""
 
         try:
             if signal.signal_type in [SignalType.BUY, SignalType.SELL]:
@@ -358,17 +358,17 @@ class TradingEngine:
 
         except Exception as e:
             self.logger.error(f"❌ Error executing signal: {e}")
-            # Notify strategy of error
+            # 通知策略发生错误
             if self.strategy:
                 self.strategy.on_error(e, {"signal": signal})
 
     async def _place_order(self, signal: TradingSignal) -> None:
-        """Place an order based on trading signal"""
+        """根据交易信号下单"""
 
-        # Create order
+        # 创建订单
         current_time = time.time()
         order = Order(
-            id=f"order_{int(current_time * 1000)}",  # Simple ID generation
+            id=f"order_{int(current_time * 1000)}",  # 简单的ID生成
             asset=signal.asset,
             side=OrderSide.BUY
             if signal.signal_type == SignalType.BUY
@@ -379,44 +379,44 @@ class TradingEngine:
             created_at=current_time,
         )
 
-        # Place order with exchange
+        # 在交易所下单
         exchange_order_id = await self.exchange.place_order(order)
         order.exchange_order_id = exchange_order_id
         order.status = OrderStatus.SUBMITTED
 
-        # Track pending order
+        # 跟踪待处理订单
         self.pending_orders[order.id] = order
 
         self.logger.info(
             f"📝 Placed {order.side.value} order: {order.size} {order.asset} @ ${order.price}"
         )
 
-        # Notify strategy
+        # 通知策略
         if self.strategy:
-            # Simulate immediate execution for now (real implementation would track fills)
+            # 目前模拟立即执行(实际实现会跟踪成交)
             executed_price = order.price or 0.0
             self.strategy.on_trade_executed(signal, executed_price, order.size)
             self.executed_trades += 1
 
     async def _close_positions(self, signal: TradingSignal) -> None:
-        """Close positions (e.g., cancel all orders for rebalancing)"""
+        """关闭持仓(例如,为再平衡取消所有订单)"""
 
         if signal.metadata.get("action") == "cancel_all":
             cancelled = await self.exchange.cancel_all_orders()
             self.logger.info(f"🗑️ Cancelled {cancelled} orders for rebalancing")
 
     async def _trading_loop(self) -> None:
-        """Main trading loop for periodic tasks"""
+        """用于周期性任务的主交易循环"""
 
         while self.running:
             try:
-                # Periodic health checks, order status updates, etc.
-                await asyncio.sleep(60)  # Check every minute
+                # 周期性健康检查、订单状态更新等
+                await asyncio.sleep(60)  # 每分钟检查一次
 
-                # Update order statuses (simplified)
+                # 更新订单状态(简化版)
                 await self._update_order_statuses()
 
-                # Log status
+                # 记录状态
                 if self.executed_trades > 0:
                     self.logger.info(f"📊 Total trades: {self.executed_trades}")
 
@@ -425,21 +425,21 @@ class TradingEngine:
                 await asyncio.sleep(60)
 
     async def _update_order_statuses(self) -> None:
-        """Update status of pending orders"""
+        """更新待处理订单的状态"""
 
-        # This would query the exchange for order statuses
-        # For now, we'll just clean up old orders
+        # 这里会查询交易所获取订单状态
+        # 目前仅清理旧订单
         current_time = time.time()
 
         for order_id in list(self.pending_orders.keys()):
             order = self.pending_orders[order_id]
 
-            # Remove orders older than 1 hour (they're probably filled or cancelled)
+            # 移除超过1小时的订单(可能已成交或已取消)
             if current_time - order.created_at > 3600:
                 del self.pending_orders[order_id]
 
     def get_status(self) -> Dict[str, Any]:
-        """Get engine status"""
+        """获取引擎状态"""
 
         return {
             "running": self.running,

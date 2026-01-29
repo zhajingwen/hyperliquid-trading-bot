@@ -1,8 +1,8 @@
 """
-Basic Grid Trading Strategy
+基础网格交易策略
 
-Simple grid strategy that places buy and sell orders at regular intervals.
-This is the main business logic for grid trading.
+在固定间隔下达买卖订单的简单网格策略。
+这是网格交易的主要业务逻辑。
 """
 
 import time
@@ -20,7 +20,7 @@ from interfaces.strategy import (
 
 
 class GridState(Enum):
-    """Grid states"""
+    """网格状态"""
 
     INITIALIZING = "initializing"
     ACTIVE = "active"
@@ -30,30 +30,30 @@ class GridState(Enum):
 
 @dataclass
 class GridLevel:
-    """Individual grid level"""
+    """单个网格层级"""
 
     price: float
     size: float
     level_index: int
-    is_buy_level: bool  # True for buy levels, False for sell levels
+    is_buy_level: bool  # True表示买入层级,False表示卖出层级
     is_filled: bool = False
 
 
 @dataclass
 class GridConfig:
-    """Grid configuration"""
+    """网格配置"""
 
     symbol: str
     levels: int = 10
-    range_pct: float = 10.0  # ±10% from center price
+    range_pct: float = 10.0  # 距中心价格±10%
     total_allocation: float = 1000.0  # USD
 
-    # Price range (auto-calculated if not set)
+    # 价格区间(如果未设置则自动计算)
     min_price: Optional[float] = None
     max_price: Optional[float] = None
 
-    # Rebalancing
-    rebalance_threshold_pct: float = 15.0  # Rebalance if price moves 15% outside range
+    # 再平衡
+    rebalance_threshold_pct: float = 15.0  # 如果价格移动超出区间15%则再平衡
 
 
 class BasicGridStrategy(TradingStrategy):
